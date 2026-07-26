@@ -35,11 +35,7 @@ node keygen.mjs verify TAKE1.xxxx.yyyy           # sanity check
 
 Then pick a storefront that delivers text after purchase — Gumroad, Lemon Squeezy, and Stripe Payment Links all work. Put the product link in `index.html` (`var BUY_URL='…'`) so the Get a key button appears in the unlock screen. Flow: buyer pays, you run `issue` with their email and send the key (both platforms support manual fulfilment; automation via their webhooks can come later).
 
-A sample key that unlocks the shipped build, for testing the flow end to end before you rotate:
-
-```
-TAKE1.eyJlIjoic2FtcGxlQGJ1eWVyLnRlc3QiLCJpYXQiOjE3ODUwODQxMzEwOTcsIm5vdGUiOiJzYW1wbGUga2V5IOKAlCByb3RhdGUgYmVmb3JlIHNlbGxpbmcifQ.tft9slE0riIy4PzACqUuICiiRTfafMxqSvat_eZwSNWYVtEWT-zEaYprJVXx26Xw_r23WQWSon4-o_Y2cY7K5w
-```
+This build ships with a live public key that is already rotated — the sample keypair that came with the original scaffold is dead, and no working key is published anywhere. The private half lives only on the owner's machine, outside this folder, and is never committed.
 
 Honest caveat: the check runs client-side, so a determined person can crack it. For an indie tool at indie prices this is normal and fine; if piracy ever actually costs you money, that is the moment to add a license server, not before.
 
