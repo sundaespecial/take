@@ -445,7 +445,7 @@
 
           <rect x="42" y="292" width="300" height="66" fill="#FBF8EF" stroke="#171410" stroke-width="2"/>
           <text x="56" y="318" font-size="15" font-weight="700" fill="#171410">Field extractor</text>
-          <text x="56" y="338" font-family="IBM Plex Mono,monospace" font-size="10.5" fill="#6E6558">Gemma 3 1B · 8k ctx · fills, never composes</text>
+          <text x="56" y="338" font-family="IBM Plex Mono,monospace" font-size="10.5" fill="#6E6558">deterministic regex · fills, never composes</text>
 
           <rect x="42" y="400" width="300" height="66" fill="#FBF8EF" stroke="#171410" stroke-width="2"/>
           <text x="56" y="426" font-size="15" font-weight="700" fill="#171410">Template renderer</text>
@@ -531,19 +531,19 @@
         <div class="d">Their silicon, their battery. This line never grows with usage.</div>
       </div>
       <div class="cost">
-        <div class="k">Relay and weights, 1,000 users</div>
+        <div class="k">Relay and weights, 1,000 users (planned)</div>
         <div class="v">$60</div>
-        <div class="d">Workers plus R2 at zero egress, plus crash tooling. Per month, total, not per seat.</div>
+        <div class="d">Workers plus R2, zero egress, per month total — once a relay ships. No relay runs in this build.</div>
       </div>
       <div class="cost">
         <div class="k">Context window needed</div>
-        <div class="v">8K</div>
-        <div class="d">A four minute dictation with schema, glossary, and two examples lands near 3,400 tokens.</div>
+        <div class="v">None</div>
+        <div class="d">The shipped extractor is deterministic regex, not a model — no context window to size. An LLM extractor (≈8K ctx) is planned.</div>
       </div>
       <div class="cost">
-        <div class="k">Peak RAM on handset</div>
+        <div class="k">Peak RAM, extractor stage (planned)</div>
         <div class="v">1.2 GB</div>
-        <div class="d">Stages run sequentially, so whisper unloads before the extractor loads.</div>
+        <div class="d">Whisper would unload before an extractor loads — once one ships. Today only the ~190 MB Whisper model is ever resident.</div>
       </div>
     </div>
   </div>
@@ -599,20 +599,23 @@ function numWord(w){
 }
 
 var CATS=[
-  [['duo','mfa','push notification','two factor','two-factor','2fa','authenticator','okta','sso','authentication'],'Authentication · MFA'],
-  [['password','locked out','lockout','account locked','credential','can’t log in','cannot log in','login'],'Accounts · Access'],
+  // specific technology keywords are checked before the generic
+  // authentication/account ones below — "VPN, authentication failed" is a
+  // VPN ticket, not an MFA ticket, even though "authentication" appears
   [['vpn','globalprotect','anyconnect','tunnel'],'Network · VPN'],
   [['wifi','wi-fi','wireless','access point','roaming','ssid','rssi'],'Network · Wireless'],
   [['printer','printing','toner','print queue','plotter'],'Peripherals · Printing'],
   [['outlook','email','mailbox','exchange','calendar','distribution list'],'Email · Exchange'],
   [['laptop','battery','keyboard','docking','dock','monitor','hardware','ssd','fan','screen flicker'],'Hardware'],
   [['sharepoint','onedrive','teams','zoom','slack','excel','powerpoint','license','install','software','application'],'Software'],
-  [['server','disk space','cpu','service down','outage','database'],'Infrastructure']
+  [['server','disk space','cpu','service down','outage','database'],'Infrastructure'],
+  [['duo','mfa','push notification','two factor','two-factor','2fa','authenticator','okta','sso','authentication'],'Authentication · MFA'],
+  [['password','locked out','lockout','account locked','credential','can’t log in','cannot log in','login'],'Accounts · Access']
 ];
 
-var ACT_RE=/\b(removed|re-?enrolled|reset|re-?imaged|replaced|verified|restarted|rebooted|cleared|re-?installed|installed|updated|patched|unlocked|mapped|granted|configured|swapped|escalated|re-?seated|renewed|rejoined|repaired|disabled|enabled|provisioned|revoked)\b/i;
-var SYM_RE=/\b(getting|can'?t|cannot|unable|fails?|failing|times? out|timing out|timed out|error|broken|down|slow|won'?t|not working|no longer|issue|problem|complain\w*|reports?|stuck|crash\w*|frozen|missing)\b/i;
-var CAUSE_RE=/\b(root cause|looks? like|because|due to|caused by|stale|misconfig\w*|expired|corrupt\w*|carried over|left over|orphan\w*|turned out)\b/i;
+var ACT_RE=/\b(removed|re-?enrolled|reset|re-?imaged|replaced|verified|restarted|rebooted|cleared|re-?installed|installed|updated|patched|unlocked|mapped|granted|configured|swapped|escalated|re-?seated|renewed|rejoined|repaired|disabled|enabled|provisioned|revoked|corrected)\b/i;
+var SYM_RE=/\b(getting|can'?t|cannot|unable|fails?|failing|times? out|timing out|timed out|error|broken|down|slow|won'?t|not working|no longer|issue|problem|complain\w*|reports?|stuck|crash\w*|frozen|missing|stopped)\b/i;
+var CAUSE_RE=/\b(root cause|looks? like|because|due to|caused by|stale|misconfig\w*|expired|corrupt\w*|carried over|left over|orphan\w*|turned out|hung|wrong)\b/i;
 var REQ_RE=/\b(needs?|requesting|requests?|would like|wants?|asked for|access to|new (?:laptop|monitor|phone|license|account)|license for)\b/i;
 
 function sentences(t){return (t||'').match(/[^.!?]+[.!?]?/g)||[]}
@@ -634,10 +637,15 @@ function extractFields(t,template,priDefault){
   var F=[];
   function push(key,label,val,tag){F.push({key:key,label:label,val:val||'',tag:val?(tag||''):'you'})}
 
-  // requester — capitalized name after a cue word
+  // requester — capitalized name after a cue word, or a sentence-opening
+  // "Name Name <reporting verb>" when the dictation just starts with who it's about
   var name=null;
   m=t.match(/\b(?:[Tt]icket for|[Ff]or|[Ff]rom|[Cc]aller(?: is)?|[Uu]ser(?: is)?|[Rr]equester(?: is)?|[Oo]n behalf of)\s+([A-Z][a-z]+(?: [A-Z][a-z]+){1,2})\b/);
   if(m)name=m[1];
+  if(!name){
+    m=t.match(/^(?!(?:Someone|Something|Somebody|Anyone|Anybody|Everyone|Everybody|This|That|It|She|He|They|We|I)\b)([A-Z][a-z]+(?: [A-Z][a-z]+){0,2})\s+(?:says?|report(?:s|ed)?|call(?:s|ed)?|can'?t|cannot|is|needs?|wants?|has|have|got|contacted)\b/);
+    if(m)name=m[1];
+  }
 
   // office / site
   var off=null;
@@ -645,11 +653,48 @@ function extractFields(t,template,priDefault){
   if(m)off=m[1];
   if(!off){m=t.match(/\b(?:in|at)\s+(?:the\s+)?([A-Z][A-Za-z]+)\s+(?:office|site)\b/);if(m)off=m[1];}
 
-  // category — first keyword table hit
+  // resolution — sentences with past-tense action verbs, first two. Found
+  // ahead of category/cause so both can prefer these sentences over
+  // incidental mentions elsewhere in the dictation.
+  var resIdx=[],res='';
+  for(i=0;i<sents.length;i++)if(ACT_RE.test(sents[i]))resIdx.push(i);
+  if(resIdx.length){
+    res=resIdx.slice(0,2).map(function(ix){consumed[ix]=1;return cleanSent(sents[ix])}).join('. ');
+  }
+
+  // symptom sentence — first non-action sentence describing what's wrong.
+  // Kept as an index (not yet clipped) so category matching can favor it too.
+  var symIdx=-1;
+  for(i=0;i<sents.length;i++){
+    if(SYM_RE.test(sents[i])&&!ACT_RE.test(sents[i])){symIdx=i;break}
+  }
+
+  // requested item, for the Request template — same idea as the symptom sentence
+  var reqIdx=-1;
+  if(template==='Request'){
+    for(i=0;i<sents.length;i++){
+      if(name&&sents[i].indexOf(name)>-1&&sents[i].trim().length<70)continue; // header sentence
+      if(REQ_RE.test(sents[i])&&!ACT_RE.test(sents[i])){reqIdx=i;break}
+    }
+  }
+
+  // category — checks the symptom/request sentence first, then the
+  // resolution sentences, then the whole transcript as a last resort.
+  // Specific technology keywords (vpn, printer, wifi…) are ordered ahead of
+  // the generic authentication/account ones in CATS, so "VPN, authentication
+  // failed" lands on VPN, not MFA, and an incidental "…in email" mention
+  // doesn't outrank "granted the license" in the resolution sentence.
   var cat=null;
-  for(i=0;i<CATS.length&&!cat;i++){
-    for(var k=0;k<CATS[i][0].length;k++){
-      if(low.indexOf(CATS[i][0][k])>-1){cat=CATS[i][1];break}
+  var primaryIdx=template==='Request'?reqIdx:symIdx;
+  var catPools=[];
+  if(primaryIdx>-1)catPools.push(sents[primaryIdx].toLowerCase());
+  resIdx.forEach(function(ix){catPools.push(sents[ix].toLowerCase())});
+  catPools.push(low);
+  for(var p=0;p<catPools.length&&!cat;p++){
+    for(i=0;i<CATS.length&&!cat;i++){
+      for(var k=0;k<CATS[i][0].length;k++){
+        if(catPools[p].indexOf(CATS[i][0][k])>-1){cat=CATS[i][1];break}
+      }
     }
   }
 
@@ -667,19 +712,15 @@ function extractFields(t,template,priDefault){
   m=t.match(/\b([A-Z]{2,5}-\d{1,4}(?:-\d{1,4})?)\b/);
   if(m)ci=m[1];
 
-  // resolution — sentences with past-tense action verbs, first two
-  var resIdx=[],res='';
-  for(i=0;i<sents.length;i++)if(ACT_RE.test(sents[i]))resIdx.push(i);
-  if(resIdx.length){
-    res=resIdx.slice(0,2).map(function(ix){consumed[ix]=1;return cleanSent(sents[ix])}).join('. ');
-  }
-
-  // root cause — causal sentence that is not an action sentence
+  // root cause — causal sentence that is not an action sentence, with any
+  // "I checked and / turns out" lead-in stripped so the cause reads clean
   var cause=null;
   for(i=0;i<sents.length;i++){
     if(CAUSE_RE.test(sents[i])&&!ACT_RE.test(sents[i])){
       var cm=sents[i].match(/\b(?:looks? like|root cause is|caused by|due to|because of)\s+(.+)$/i);
-      cause=cleanSent(cm?cm[1]:sents[i]).replace(/^(A|An|The)\s+/,'');
+      var body=cm?cm[1]:sents[i];
+      body=body.replace(/^\s*(?:i\s+checked(?:\s+and)?|i\s+found(?:\s+that)?|i\s+noticed(?:\s+that)?|it\s+turned\s+out(?:\s+that)?|it\s+turns?\s+out(?:\s+that)?|turns?\s+out(?:\s+that)?)\s+/i,'');
+      cause=cleanSent(body).replace(/^(A|An|The)\s+/,'');
       cause=cause.charAt(0).toUpperCase()+cause.slice(1);
       break;
     }
@@ -701,24 +742,16 @@ function extractFields(t,template,priDefault){
   // resolution code
   var rcode=/\bresolved on first (?:contact|call)\b|\bfirst call resolution\b/i.test(low)?'Resolved on first contact':'';
 
-  // short description — first symptom sentence that is not an action sentence
+  // short description — the symptom sentence if we found one; for the
+  // Request template fall back to the requested-item sentence (found above)
+  // before ever falling back to the raw header sentence
   var sym=null;
-  for(i=0;i<sents.length;i++){
-    if(SYM_RE.test(sents[i])&&!ACT_RE.test(sents[i])){sym=clip(cleanSent(sents[i]),90);break}
-  }
-  if(!sym&&sents.length)sym=clip(cleanSent(sents[0]),90);
+  if(symIdx>-1)sym=clip(cleanSent(sents[symIdx]),90);
+  else if(template==='Request'&&reqIdx>-1)sym=clip(cleanSent(sents[reqIdx]),90);
+  else if(sents.length)sym=clip(cleanSent(sents[0]),90);
 
-  // requested item / justification, for the Request template
-  var reqItem=null,just=null;
-  if(template==='Request'){
-    for(i=0;i<sents.length;i++){
-      if(name&&sents[i].indexOf(name)>-1&&sents[i].trim().length<70)continue; // header sentence
-      if(REQ_RE.test(sents[i])&&!ACT_RE.test(sents[i])){reqItem=clip(cleanSent(sents[i]),90);break}
-    }
-    for(i=0;i<sents.length;i++){
-      if(/\b(so that|so she|so he|so they|to be able|needs it (?:to|for)|for the|justif\w*)\b/i.test(sents[i])&&sents[i]!==sents[(reqItem?i:-1)]){just=null;break}
-    }
-  }
+  // requested item, for the Request template (index found above)
+  var reqItem=reqIdx>-1?clip(cleanSent(sents[reqIdx]),90):null;
 
   // description — the dictation minus what became structured fields
   var descParts=[];

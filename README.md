@@ -85,4 +85,6 @@ capacitor.config.json   starting point for native wraps
 
 Dictation is processed on the device (Whisper engine) or by the browser's recognizer (Speech engine — labeled as online in the UI). Extraction is deterministic rules, not generation, so empty stays empty and nothing is invented. Takes are sealed with a passphrase-derived AES-256-GCM key before storage; the store holds ciphertext it cannot read; the passphrase is never persisted or transmitted. Sealed blobs are the only thing that ever leaves the page.
 
+Full detail, including the one real tradeoff (Web Speech sends audio to the browser vendor's recognizer; Whisper doesn't) and every network request this page makes: see [PRIVACY.md](PRIVACY.md).
+
 All rights reserved — replace this line with the license terms you actually want to sell under.

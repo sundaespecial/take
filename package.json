@@ -5,6 +5,7 @@
   "description": "TAKE — dictation instrument for ticket work. On-device transcription, deterministic field extraction, sealed sync.",
   "scripts": {
     "start": "npx http-server -p 8080 -c-1 .",
-    "keygen": "node keygen.mjs"
+    "keygen": "node keygen.mjs",
+    "test": "node --test"
   }
 }
