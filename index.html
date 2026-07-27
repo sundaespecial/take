@@ -1028,6 +1028,20 @@ function verifyLicense(key,pubJwk){
     });
 }
 
+/* ---- gain: boost quiet mic input (Bluetooth/bone-conduction) before Whisper sees it ---- */
+function maxAbs(pcm){var m=0;for(var i=0;i<pcm.length;i++){var a=Math.abs(pcm[i]);if(a>m)m=a}return m}
+// We don't care about call loudness here, only about giving Whisper a clear
+// signal, so boost quiet takes toward full scale — capped so a near-silent
+// recording doesn't just amplify noise floor into audible hiss.
+function normalizeGain(pcm,peak){
+  var gain=Math.min(0.92/peak,12);
+  for(var i=0;i<pcm.length;i++){
+    var v=pcm[i]*gain;
+    pcm[i]=v>1?1:(v<-1?-1:v);
+  }
+  return pcm;
+}
+
 /* __TESTABLE_END__ */
 
 /* ================= app ================= */
@@ -1321,7 +1335,7 @@ function startRec(){
   S.take={n:S._takeN=(S._takeN||0)+1,at:Date.now(),transcript:'',fields:null,desc:'',
           template:S.template,priority:S.priority};
   S.failedAudio=null;
-  navigator.mediaDevices.getUserMedia({audio:true}).then(function(stream){
+  navigator.mediaDevices.getUserMedia({audio:{autoGainControl:true,echoCancellation:true,noiseSuppression:true}}).then(function(stream){
     S.stream=stream;S.rec=true;S.demo=false;
     var ph=el('ph');if(ph)ph.remove();
     el('recnote').innerHTML='Listening. Audio stays in memory — whisper reads it<br>on this machine when you stop.';
@@ -1442,10 +1456,15 @@ function stopRec(){
 // against the same in-memory audio without re-recording.
 function transcribeBlob(blob){
   return toPCM16k(blob).then(function(pcm){
-    if(!pcm.length||maxAbs(pcm)<0.005){
+    var peak=maxAbs(pcm);
+    if(!pcm.length||peak<0.005){
       log('silent take — nothing audible was captured','warn');
       toast('Didn’t hear anything. Check the mic and try again.');
       go(0);return;
+    }
+    if(peak<0.9){
+      normalizeGain(pcm,peak);
+      log('boosted quiet audio '+(20*Math.log10(Math.min(0.92/peak,12))).toFixed(0)+'dB before transcribing — common with Bluetooth/earbud mics');
     }
     return loadWhisper().then(function(){
       var t0=performance.now();
@@ -1464,8 +1483,6 @@ function transcribeBlob(blob){
     go(2);
   });
 }
-function maxAbs(pcm){var m=0;for(var i=0;i<pcm.length;i++){var a=Math.abs(pcm[i]);if(a>m)m=a}return m}
-
 function finishTake(){
   if(!S.take.transcript){
     toast('Nothing heard. The take was discarded, not saved.');
