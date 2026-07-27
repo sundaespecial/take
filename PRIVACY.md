@@ -11,7 +11,7 @@ crash reporting anywhere in the code.
 
 ## Your voice
 
-Whisper (`Xenova/whisper-tiny.en`, run via `@xenova/transformers` in-page) is the
+Whisper (`Xenova/whisper-base.en`, run via `@xenova/transformers` in-page) is the
 only speech engine. Transcription happens entirely on your device — audio is never
 written to disk and never sent anywhere, over any network. It also never persists
 across a reload: if you close the tab or the OS kills a backgrounded page mid-
@@ -81,8 +81,8 @@ itself travels (native share sheet, message, email) — TAKE only makes the link
   requesting IP address for this, as with any font CDN.
 - **Whisper model weights**: the app preloads Whisper shortly after launch (so
   recording can start before it's ready). The page loads `@xenova/transformers`
-  from `cdn.jsdelivr.net` and the `Xenova/whisper-tiny.en` model from
-  `huggingface.co`. This is a one-time ~40 MB download of code and model weights,
+  from `cdn.jsdelivr.net` and the `Xenova/whisper-base.en` model from
+  `huggingface.co`. This is a one-time ~80 MB download of code and model weights,
   not your data; it's cached by the browser afterward (`transformers.js`'s own
   Cache Storage entry, separate from the app shell cache in `sw.js`) so it isn't
   repeated.

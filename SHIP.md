@@ -12,7 +12,7 @@ Step 2. Repo → Settings → Pages → Source: "Deploy from a branch" → Branc
 
 Step 3. Open that URL on each phone and run the same drill on both:
 
-Android (Chrome): press REC → allow the microphone → talk a fake ticket → STOP → the Ticket screen shows the extracted fields and the rendered ticket → Copy. Whisper preloads itself on Wi-Fi in the background (first run downloads ~40 MB — add `?debug=1` to the URL to watch it happen in the operator's log), so the first take you record after that download finishes transcribes with the radios off too: turn on airplane mode and record again, it still works. That is the product's whole argument, witnessed on your own hardware. Install it: the Install button lights up in the header, or menu ⋮ → Add to Home screen.
+Android (Chrome): press REC → allow the microphone → talk a fake ticket → STOP → the Ticket screen shows the extracted fields and the rendered ticket → Copy. Whisper preloads itself on Wi-Fi in the background (first run downloads ~80 MB — add `?debug=1` to the URL to watch it happen in the operator's log), so the first take you record after that download finishes transcribes with the radios off too: turn on airplane mode and record again, it still works. That is the product's whole argument, witnessed on your own hardware. Install it: the Install button lights up in the header, or menu ⋮ → Add to Home screen.
 
 iPhone (Safari): same drill. Install: Share → Add to Home Screen. The installed copy runs full-screen with its own icon and the mic works inside it.
 

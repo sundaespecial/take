@@ -63,6 +63,7 @@
   }
 
   *{box-sizing:border-box;margin:0;padding:0}
+  html,body{height:100%}
   html{-webkit-text-size-adjust:100%}
   body{
     background:linear-gradient(175deg,var(--wood-a) 0%,var(--wood-b) 120%);
@@ -70,10 +71,11 @@
     font-family:'Archivo',system-ui,sans-serif;
     font-size:15px;
     line-height:1.5;
-    padding:20px 16px 56px;
-    min-height:100vh;
+    padding:10px 12px max(10px,env(safe-area-inset-bottom));
+    min-height:100vh;min-height:100dvh;
+    display:flex;flex-direction:column;
   }
-  .wrap{max-width:640px;margin:0 auto}
+  .wrap{max-width:640px;margin:0 auto;width:100%;flex:1;display:flex;flex-direction:column;min-height:0}
   @media(min-width:860px){.wrap{max-width:900px}}
 
   .enclosure{
@@ -86,20 +88,20 @@
 
   /* faceplate header */
   .bar{
-    display:flex;align-items:stretch;gap:10px;
+    display:flex;align-items:stretch;gap:10px;flex:0 0 auto;
     background:linear-gradient(170deg,var(--metal-a),var(--metal-b));
     border:1px solid var(--hair);
     border-radius:12px;
     padding:0;
     box-shadow:inset 0 1px 0 rgba(255,255,255,.35),0 1px 2px var(--shadow-soft);
-    margin-bottom:14px;
+    margin-bottom:8px;
   }
   .mark{
-    padding:13px 16px;display:flex;align-items:center;gap:12px;flex:1;min-width:0;
+    padding:8px 14px;display:flex;align-items:center;gap:12px;flex:1;min-width:0;
   }
   .mark h1{
     font-family:'Archivo Black','Archivo',sans-serif;
-    font-size:22px;letter-spacing:-.05em;line-height:1;color:var(--display-ink);
+    font-size:19px;letter-spacing:-.05em;line-height:1;color:var(--display-ink);
   }
   .mark .sub{
     font-family:'IBM Plex Mono',monospace;font-size:9.5px;
@@ -126,9 +128,13 @@
   .instbtn{display:none}
 
   /* device shell — wood enclosure > metal screen > glass display, three material layers */
+  #device-view{flex:1;display:flex;flex-direction:column;min-height:0}
+  #device-view.off{display:none}
+  #hardware{flex:1;display:flex;flex-direction:column;min-height:0}
   .device{
-    max-width:420px;margin:0 auto;position:relative;
-    padding:9px;border-radius:30px;
+    max-width:420px;width:100%;margin:0 auto;position:relative;
+    flex:1;display:flex;flex-direction:column;min-height:0;
+    padding:7px;border-radius:26px;
     background:
       repeating-linear-gradient(96deg,transparent 0 1.1rem,var(--wood-line) 1.15rem 1.22rem,transparent 1.28rem 2.2rem),
       linear-gradient(104deg,var(--wood-b),var(--wood-a) 18%,var(--wood-b) 48%,var(--wood-a) 72%,var(--wood-b));
@@ -136,12 +142,12 @@
     box-shadow:.5rem .6rem 1.1rem var(--shadow-soft);
   }
   .device::before{
-    content:'';position:absolute;right:-6px;top:120px;width:9px;height:52px;border-radius:0 6px 6px 0;
+    content:'';position:absolute;right:-6px;top:32%;width:9px;height:44px;border-radius:0 6px 6px 0;
     background:repeating-linear-gradient(180deg,var(--metal-a) 0 3px,var(--metal-b) 3px 6px);
     border:1px solid var(--metal-b);box-shadow:2px 2px 4px var(--shadow-soft);
   }
   .device::after{
-    content:'';display:block;width:64px;height:4px;margin:8px auto 0;border-radius:999px;
+    content:'';display:block;flex:0 0 auto;width:56px;height:4px;margin:6px auto 0;border-radius:999px;
     background:color-mix(in srgb,var(--wood-b) 65%,var(--metal-a));
   }
   .screen{
@@ -149,15 +155,15 @@
       linear-gradient(100deg,transparent 0 45%,rgba(255,255,255,.16) 50%,transparent 55%),
       linear-gradient(180deg,var(--metal-a),var(--metal-b));
     border:1px solid color-mix(in srgb,var(--metal-b) 80%,var(--ink));
-    border-radius:22px;
+    border-radius:20px;
     box-shadow:inset 0 1px 0 rgba(255,255,255,.4),inset 0 -1px 0 rgba(0,0,0,.12);
-    padding:7px;
-    min-height:560px;display:flex;flex-direction:column;overflow:hidden;position:relative;
+    padding:6px;
+    flex:1;display:flex;flex-direction:column;overflow:hidden;position:relative;min-height:0;
   }
 
   .statusbar{
-    display:flex;justify-content:space-between;align-items:center;gap:8px;
-    padding:10px 14px;border-bottom:1px solid var(--glass-line);
+    display:flex;justify-content:space-between;align-items:center;gap:8px;flex:0 0 auto;
+    padding:7px 14px;border-bottom:1px solid var(--glass-line);
     background:radial-gradient(140% 160% at 15% -20%,rgba(255,255,255,.5),transparent 55%),var(--display);
     border-radius:15px 15px 0 0;
     font-family:'IBM Plex Mono',monospace;font-size:9.5px;letter-spacing:.1em;
@@ -171,7 +177,7 @@
   .clock{font-family:'IBM Plex Mono',monospace;font-size:13px;font-weight:600;letter-spacing:-.01em;color:var(--ink)}
 
   .body{
-    flex:1;overflow-y:auto;display:flex;flex-direction:column;
+    flex:1;overflow-y:auto;display:flex;flex-direction:column;min-height:0;
     background:var(--display);border-radius:0 0 15px 15px;
   }
   .body::-webkit-scrollbar{width:4px}
@@ -184,7 +190,7 @@
 
   /* acoustic deck — decorative perforated grille strip above the glass */
   .deckstrip{
-    height:22px;flex:0 0 auto;
+    height:16px;flex:0 0 auto;
     background:
       radial-gradient(circle,var(--hole) 0 1.6px,transparent 1.8px) 0 0/13px 13px,
       linear-gradient(180deg,color-mix(in srgb,var(--metal-b) 82%,var(--ink)),var(--metal-b));
@@ -195,13 +201,13 @@
   .device .screen > .deckstrip + .statusbar{border-radius:0}
 
   /* live waveform */
-  .wavewrap{padding:6px 10px 0}
-  .wave{display:block;width:100%;height:auto;filter:saturate(1.12)}
+  .wavewrap{padding:6px 10px 0;flex:0 0 auto}
+  .wave{display:block;width:100%;height:52px;filter:saturate(1.12)}
   [data-theme="dark"] .wave{filter:saturate(1.2) drop-shadow(0 0 5px color-mix(in srgb,var(--sp-5) 30%,transparent))}
   .waveaxis{stroke:var(--glass-line);stroke-width:1}
 
   /* transcript */
-  .live{padding:10px 14px 14px;flex:1;min-height:96px}
+  .live{padding:8px 14px 12px;flex:1;min-height:64px}
   .live .eyebrow{margin-bottom:8px;display:block}
   .caret{display:inline-block;width:7px;height:15px;background:var(--pilot);
          vertical-align:-2px;margin-left:2px}
@@ -210,7 +216,7 @@
   #tint{color:var(--ink-soft)}
   .placeholder{color:var(--ink-soft);font-size:13.5px;line-height:1.6}
 
-  .tray{padding:12px 14px 14px;margin-top:9px;border-radius:18px;
+  .tray{padding:9px 12px 10px;margin-top:7px;border-radius:18px;flex:0 0 auto;
     background:linear-gradient(100deg,transparent 0 45%,rgba(255,255,255,.14) 50%,transparent 55%),linear-gradient(180deg,var(--metal-a),var(--metal-b));
     border:1px solid color-mix(in srgb,var(--metal-b) 80%,var(--ink));box-shadow:inset 0 1px 0 rgba(255,255,255,.35)}
   .chip{
@@ -316,12 +322,12 @@
   .toast.up{opacity:1;transform:translateY(0)}
 
   /* bottom transport — Capture / Ticket only */
-  .transport{display:flex;margin-top:16px;border-radius:12px;overflow:hidden;border:1px solid var(--hair);
-    background:linear-gradient(170deg,var(--metal-a),var(--metal-b));max-width:420px;margin-left:auto;margin-right:auto;
+  .transport{display:flex;flex:0 0 auto;margin-top:8px;border-radius:12px;overflow:hidden;border:1px solid var(--hair);
+    background:linear-gradient(170deg,var(--metal-a),var(--metal-b));max-width:420px;width:100%;margin-left:auto;margin-right:auto;
     box-shadow:0 1px 2px var(--shadow-soft)}
   .tbtn{
     flex:1;background:transparent;border:none;
-    padding:11px 4px;cursor:pointer;font-family:'IBM Plex Mono',monospace;font-size:10px;
+    padding:9px 4px;cursor:pointer;font-family:'IBM Plex Mono',monospace;font-size:10px;
     letter-spacing:.09em;text-transform:uppercase;font-weight:600;color:var(--ink-soft);
   }
   .tbtn[aria-pressed="true"]{background:var(--pilot);color:#3a2400}
@@ -383,7 +389,6 @@
   /* schematic (debug only) */
   #schematic{display:none}
   #schematic.on{display:block}
-  #device-view.off{display:none}
   .schemhead{margin-bottom:22px;max-width:70ch}
   .schemhead h2{font-family:'Archivo Black',sans-serif;font-size:24px;letter-spacing:-.04em;text-transform:uppercase}
   .schemhead p{color:var(--ink-soft);margin-top:6px}
@@ -499,7 +504,7 @@
 
           <rect x="42" y="184" width="300" height="66" fill="#FBF8EF" stroke="#171410" stroke-width="2"/>
           <text x="56" y="210" font-size="15" font-weight="700" fill="#171410">Whisper (on-device)</text>
-          <text x="56" y="230" font-family="IBM Plex Mono,monospace" font-size="10.5" fill="#6E6558">whisper-tiny.en · only speech engine · offline after first load</text>
+          <text x="56" y="230" font-family="IBM Plex Mono,monospace" font-size="10.5" fill="#6E6558">whisper-base.en · only speech engine · offline after first load</text>
 
           <rect x="42" y="292" width="300" height="66" fill="#FBF8EF" stroke="#171410" stroke-width="2"/>
           <text x="56" y="318" font-size="15" font-weight="700" fill="#171410">Field extractor</text>
@@ -571,7 +576,7 @@
       <div class="cost">
         <div class="k">Peak RAM, extractor stage (planned)</div>
         <div class="v">1.2 GB</div>
-        <div class="d">Whisper would unload before an extractor loads — once one ships. Today only the ~190 MB Whisper model is ever resident.</div>
+        <div class="d">Whisper would unload before an extractor loads — once one ships. Today only the ~80 MB Whisper model is ever resident.</div>
       </div>
     </div>
   </div>
@@ -1078,7 +1083,7 @@ function updatePipe(){
   var host=el('pipe');if(!host)return;
   var h='';
   h+=pipeRow('Engine','Whisper · on this machine','ok');
-  h+=S.wh.ready?pipeRow('Model','whisper-tiny.en · cached','ok')
+  h+=S.wh.ready?pipeRow('Model','whisper-base.en · cached','ok')
     :S.wh.loading?pipeRow('Model','downloading…','warn')
     :S.wh.err?pipeRow('Model','load failed','bad')
     :pipeRow('Model','not loaded','');
@@ -1150,7 +1155,7 @@ function screenCapture(){
   +'<div class="deckstrip" aria-hidden="true"></div>'
   +'<div class="statusbar"><span class="airplane"><i class="dot" id="sbDot"></i><span id="sbEng">'+esc(statusText())+'</span></span><span class="clock" id="clock">00:00</span></div>'
   +'<div class="body">'
-    +'<div class="wavewrap"><svg class="wave" viewBox="0 0 320 122" role="img" aria-label="Live audio waveform">'
+    +'<div class="wavewrap"><svg class="wave" viewBox="0 0 320 122" preserveAspectRatio="none" role="img" aria-label="Live audio waveform">'
       +'<defs><linearGradient id="waveGrad" x1="0" x2="1">'
         +'<stop offset="0" style="stop-color:var(--sp-1)"/>'
         +'<stop offset=".2" style="stop-color:var(--sp-2)"/>'
@@ -1383,12 +1388,12 @@ function loadWhisper(){
   if(S.wh.ready)return Promise.resolve();
   if(S.wh.loading)return S.wh.loading;
   updatePipe();
-  log('fetching whisper-tiny.en (≈40 MB once, then cached by the browser)…');
+  log('fetching whisper-base.en (≈80 MB once, then cached by the browser)…');
   var lastPct=-10;
   S.wh.loading=import('https://cdn.jsdelivr.net/npm/@xenova/transformers@2.17.2/+esm')
     .then(function(mod){
       mod.env.allowLocalModels=false;
-      return mod.pipeline('automatic-speech-recognition','Xenova/whisper-tiny.en',{
+      return mod.pipeline('automatic-speech-recognition','Xenova/whisper-base.en',{
         quantized:true,
         progress_callback:function(p){
           if(p&&p.status==='progress'&&p.total){
