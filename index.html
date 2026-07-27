@@ -33,7 +33,7 @@
     --on-accent:#FBF8EF;
     --live-c:var(--oxblood);
     /* waveform spectrum — six stops, overridden per palette below */
-    --sp-1:#ff5a36; --sp-2:#f3ab27; --sp-3:#27b27c; --sp-4:#14a7d5; --sp-5:#394de2; --sp-6:#d43d9e;
+    --sp-1:#ff6b35; --sp-2:#ff2e88; --sp-3:#d946ef; --sp-4:#8b5cf6; --sp-5:#38bdf8; --sp-6:#22d3ee;
     --glow-c: color-mix(in srgb, var(--sp-2) 32%, transparent);
   }
   [data-theme="dark"]{
@@ -201,10 +201,23 @@
   .device .screen > .deckstrip + .statusbar{border-radius:0}
 
   /* live waveform */
-  .wavewrap{padding:6px 10px 0;flex:0 0 auto}
-  .wave{display:block;width:100%;height:52px;filter:saturate(1.12)}
-  [data-theme="dark"] .wave{filter:saturate(1.2) drop-shadow(0 0 5px color-mix(in srgb,var(--sp-5) 30%,transparent))}
-  .waveaxis{stroke:var(--glass-line);stroke-width:1}
+  .wavewrap{padding:8px 10px 4px;flex:0 0 auto}
+  .vu{
+    display:flex;align-items:flex-end;justify-content:center;gap:3px;height:52px;
+    filter:saturate(1.2) drop-shadow(0 0 7px color-mix(in srgb,var(--sp-3) 55%,transparent));
+  }
+  [data-theme="dark"] .vu{filter:saturate(1.3) drop-shadow(0 0 9px color-mix(in srgb,var(--sp-3) 65%,transparent))}
+  .vu i{
+    flex:1;max-width:8px;height:6%;min-height:3px;border-radius:3px 3px 1px 1px;
+    background:var(--sp-3);transition:height .1s ease-out;opacity:.92;
+  }
+  .vu i:nth-child(-n+4){background:var(--sp-1)}
+  .vu i:nth-child(n+5):nth-child(-n+8){background:var(--sp-2)}
+  .vu i:nth-child(n+9):nth-child(-n+12){background:var(--sp-3)}
+  .vu i:nth-child(n+13):nth-child(-n+16){background:var(--sp-4)}
+  .vu i:nth-child(n+17):nth-child(-n+20){background:var(--sp-5)}
+  .vu i:nth-child(n+21){background:var(--sp-6)}
+  .vu i.peak{filter:brightness(1.35)}
 
   /* transcript */
   .live{padding:8px 14px 12px;flex:1;min-height:64px}
@@ -1155,18 +1168,7 @@ function screenCapture(){
   +'<div class="deckstrip" aria-hidden="true"></div>'
   +'<div class="statusbar"><span class="airplane"><i class="dot" id="sbDot"></i><span id="sbEng">'+esc(statusText())+'</span></span><span class="clock" id="clock">00:00</span></div>'
   +'<div class="body">'
-    +'<div class="wavewrap"><svg class="wave" viewBox="0 0 320 122" preserveAspectRatio="none" role="img" aria-label="Live audio waveform">'
-      +'<defs><linearGradient id="waveGrad" x1="0" x2="1">'
-        +'<stop offset="0" style="stop-color:var(--sp-1)"/>'
-        +'<stop offset=".2" style="stop-color:var(--sp-2)"/>'
-        +'<stop offset=".4" style="stop-color:var(--sp-3)"/>'
-        +'<stop offset=".6" style="stop-color:var(--sp-4)"/>'
-        +'<stop offset=".8" style="stop-color:var(--sp-5)"/>'
-        +'<stop offset="1" style="stop-color:var(--sp-6)"/>'
-      +'</linearGradient></defs>'
-      +'<path id="wavepath" fill="url(#waveGrad)" d="'+waveFlatPath()+'"/>'
-      +'<line x1="0" y1="61" x2="320" y2="61" class="waveaxis"/>'
-    +'</svg></div>'
+    +'<div class="wavewrap"><div class="vu" id="vu" role="img" aria-label="Live audio level">'+barSegs()+'</div></div>'
     +'<div class="live"><span class="eyebrow">Heard so far</span>'
       +'<div id="tape"><span class="placeholder" id="ph">Press the amber button and describe what happened the way you would tell a colleague. Whisper transcribes on this machine after you stop. No mic handy? Press DEMO.</span>'
       +'<span id="tfin"></span><span id="tint"></span><i class="caret off" id="car"></i></div></div>'
@@ -1183,17 +1185,11 @@ function screenCapture(){
   +'</div></div>';
 }
 
-/* ---- live waveform: real analyser samples become a filled SVG ribbon ---- */
-var WAVE_N=33;
-function waveXY(amps){
-  var w=320,cy=61,half=52,n=amps.length,step=w/(n-1),d='',i,x,y;
-  for(i=0;i<n;i++){x=(i*step).toFixed(1);y=(cy-amps[i]*half).toFixed(1);d+=(i===0?'M':'L')+x+','+y+' '}
-  for(i=n-1;i>=0;i--){x=(i*step).toFixed(1);y=(cy+amps[i]*half).toFixed(1);d+='L'+x+','+y+' '}
-  return d+'Z';
-}
-function waveFlatPath(){
-  var a=[];for(var i=0;i<WAVE_N;i++)a.push(0.03);
-  return waveXY(a);
+/* ---- live waveform: real analyser samples become a bar-style vaporwave meter ---- */
+var WAVE_N=24;
+function barSegs(){
+  var s='';for(var i=0;i<WAVE_N;i++)s+='<i></i>';
+  return s;
 }
 
 function fieldHTML(f){
@@ -1262,27 +1258,32 @@ function releaseStream(){
   if(S.ac){try{S.ac.close()}catch(e){}S.ac=null;S.an=null}
   if(S.wakeLock){try{S.wakeLock.release()}catch(e){}S.wakeLock=null}
 }
-function paintWave(amps){
-  var p=el('wavepath');if(p)p.setAttribute('d',waveXY(amps));
+function paintBars(levels){
+  var bars=document.querySelectorAll('#vu i');
+  bars.forEach(function(b,i){
+    var v=Math.max(0,Math.min(1,levels[i]||0));
+    b.style.height=(6+v*94)+'%';
+    b.classList.toggle('peak',v>0.82);
+  });
 }
 function zeroVU(){
-  var p=el('wavepath');if(p)p.setAttribute('d',waveFlatPath());
+  document.querySelectorAll('#vu i').forEach(function(b){b.style.height='6%';b.classList.remove('peak')});
 }
 function startVU(){
   S.ac=new (window.AudioContext||window.webkitAudioContext)();
   if(S.ac.state==='suspended')S.ac.resume().catch(function(){});
   var src=S.ac.createMediaStreamSource(S.stream);
-  S.an=S.ac.createAnalyser();S.an.fftSize=1024;
+  S.an=S.ac.createAnalyser();S.an.fftSize=128;S.an.smoothingTimeConstant=0.72;
   src.connect(S.an);
-  var data=new Uint8Array(S.an.fftSize);
+  var data=new Uint8Array(S.an.frequencyBinCount);
   S.meter=setInterval(function(){
-    S.an.getByteTimeDomainData(data);
-    var amps=[],step=Math.floor(data.length/WAVE_N);
+    S.an.getByteFrequencyData(data);
+    var levels=[],n=data.length;
     for(var i=0;i<WAVE_N;i++){
-      var v=(data[i*step]-128)/128;
-      amps.push(Math.max(-1,Math.min(1,v*2.2)));
+      var idx=Math.min(n-1,Math.round(i/(WAVE_N-1)*(n-1)));
+      levels.push(Math.min(1,(data[idx]/255)*1.3));
     }
-    paintWave(amps);
+    paintBars(levels);
   },70);
 }
 function startClock(){
@@ -1496,7 +1497,7 @@ function runDemo(){
   S.meter=setInterval(function(){
     var amps=[],t=Date.now()/160;
     for(var i=0;i<WAVE_N;i++)amps.push(0.22+0.55*Math.abs(Math.sin(i*0.5+t)));
-    paintWave(amps);
+    paintBars(amps);
   },70);
   var words=DEMO_TAPE.split(' '),i=0;
   S.demoI=setInterval(function(){
