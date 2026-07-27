@@ -1,6 +1,8 @@
 # TAKE
 
-Dictation instrument for ticket work. Talk the way you would tell a colleague; TAKE transcribes, extracts the facts into fields (fills, never composes), renders a ticket in your house style, and seals it with AES-256-GCM before it goes anywhere. Two speech engines: Web Speech (live captions, browser recognizer) and Whisper running fully on the device. Light and "burst" dark finishes.
+Dictation instrument for ticket work. Press REC, talk the way you would tell a colleague, stop — TAKE transcribes on-device with Whisper, extracts the facts into fields (fills, never composes), and renders a ticket. Two screens only: **Capture** and **Ticket**. Everything else — finish, waveform color, your name, license — lives behind the settings gear so it never competes with those two.
+
+Whisper is the only speech engine; it runs entirely on the device, model and all. Two material finishes (Light, Dark, or System) and three waveform color presets (Rainbow, Black & White, Amber). Sharing a finished ticket to a desktop is a link, not an account: Private links are AES-256-GCM sealed with a passphrase you choose, Open links are plainly encoded and say so before you generate one. Either way there is no server — the link carries the ticket, the same way a video link carries a video ID. Opening a TAKE share link renders a small "legal pad" receiver page with Copy and Clear; nothing is ever stored.
 
 One HTML file, no build step, no backend required.
 
@@ -45,7 +47,7 @@ This is a PWA. On Android Chrome, the Install button lights up in the header (or
 
 ## Real Android / iOS store apps (when you want them)
 
-The web app wraps cleanly with Capacitor. What it costs: Google Play $25 once, Apple $99/year, an Android Studio install, and a Mac with Xcode for iOS. One functional caveat to know upfront: the Web Speech engine does not exist inside store-app WebViews, so in wrapped builds Whisper is the engine — which is fine, it is the engine that honors the privacy story anyway.
+The web app wraps cleanly with Capacitor. What it costs: Google Play $25 once, Apple $99/year, an Android Studio install, and a Mac with Xcode for iOS. Whisper is the only engine on the web build too now, so there is no store-WebView caveat to work around — the wrapped app behaves the same as the PWA.
 
 ```
 npm install @capacitor/core @capacitor/cli
@@ -70,21 +72,27 @@ iOS — add to `ios/App/App/Info.plist`:
 
 Store apps also let you swap the license gate for real in-app purchase later, which Apple requires for digital goods sold inside iOS apps — another reason the PWA-first route is the sensible start.
 
+## Debug mode
+
+Open the page with `?debug=1` to see the Schematic diagram and the operator's log (a running narration of everything the page is doing) — useful for your own testing and bug reports, hidden from customers because it isn't part of the two-screen product.
+
 ## Repo map
 
 ```
-index.html              the entire app — UI, engines, extractor, crypto, license gate
+index.html              the entire app — UI, extractor, crypto, license gate, share links
 sw.js                   offline shell caching
 manifest.webmanifest    install metadata
 icon-*.png              app icons, light-on-ebony (flat, so any uploader works)
-keygen.mjs        license keypair + key issuing (no dependencies)
+keygen.mjs              license keypair + key issuing (no dependencies)
 capacitor.config.json   starting point for native wraps
+test/                   node --test suite for the extractor and narrative renderer
+tools/verify.mjs        structural/static checks (nav, syntax, required presets)
 ```
 
 ## Privacy posture, in one paragraph
 
-Dictation is processed on the device (Whisper engine) or by the browser's recognizer (Speech engine — labeled as online in the UI). Extraction is deterministic rules, not generation, so empty stays empty and nothing is invented. Takes are sealed with a passphrase-derived AES-256-GCM key before storage; the store holds ciphertext it cannot read; the passphrase is never persisted or transmitted. Sealed blobs are the only thing that ever leaves the page.
+Dictation is transcribed on-device by Whisper — there is no other engine, and no audio is ever sent anywhere. Extraction is deterministic rules, not generation, so empty stays empty and nothing is invented. Nothing is written to storage by default; if you choose to share a ticket, a Private link is sealed with a passphrase-derived AES-256-GCM key (the passphrase itself never enters the link), an Open link is plainly encoded and says so before you generate it, and either way the payload lives only in the URL fragment — there is no relay server and nothing is ever stored server-side.
 
-Full detail, including the one real tradeoff (Web Speech sends audio to the browser vendor's recognizer; Whisper doesn't) and every network request this page makes: see [PRIVACY.md](PRIVACY.md).
+Full detail and every network request this page makes: see [PRIVACY.md](PRIVACY.md).
 
 All rights reserved — replace this line with the license terms you actually want to sell under.

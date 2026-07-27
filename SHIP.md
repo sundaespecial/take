@@ -12,11 +12,11 @@ Step 2. Repo → Settings → Pages → Source: "Deploy from a branch" → Branc
 
 Step 3. Open that URL on each phone and run the same drill on both:
 
-Android (Chrome): press REC → allow the microphone → talk a fake ticket → STOP → check Review → Render → Copy. Then switch the engine chip to Whisper on Wi-Fi (first run downloads ~40 MB, watch the operator's log), record once so the model caches, then turn on airplane mode and record again. It still transcribes. That is the product's whole argument, witnessed on your own hardware. Install it: the Install button lights up in the header, or menu ⋮ → Add to Home screen.
+Android (Chrome): press REC → allow the microphone → talk a fake ticket → STOP → the Ticket screen shows the extracted fields and the rendered ticket → Copy. Whisper preloads itself on Wi-Fi in the background (first run downloads ~40 MB — add `?debug=1` to the URL to watch it happen in the operator's log), so the first take you record after that download finishes transcribes with the radios off too: turn on airplane mode and record again, it still works. That is the product's whole argument, witnessed on your own hardware. Install it: the Install button lights up in the header, or menu ⋮ → Add to Home screen.
 
-iPhone (Safari): same drill. Install: Share → Add to Home Screen. The installed copy runs full-screen with its own icon and the mic works inside it. If the Speech engine is flaky on iOS (it can be), Whisper is the dependable one there.
+iPhone (Safari): same drill. Install: Share → Add to Home Screen. The installed copy runs full-screen with its own icon and the mic works inside it.
 
-Also worth testing on both: seal a take with a passphrase, open Desk, unseal; burn through the 10-take trial and unlock with the sample key from the README; flip Burst/Light.
+Also worth testing on both: from the Ticket screen, tap Share → Private, set a passphrase, generate the link, then open that link in another tab or device and unseal it; try an Open link too and confirm the "anyone with this link" warning shows before it generates; burn through the 10-take trial and unlock with the sample key from the README; open Settings and flip the finish (Light/Dark/System) and waveform color (Rainbow/Black & White/Amber).
 
 A note on "solely on my phone": the Pages URL is public but unguessable, and the license gate limits freeloaders to 10 takes. If you want testing with nothing published at all, run `npx http-server -p 8080 .` on the PC and in another terminal `npx localtunnel --port 8080` — it prints a temporary HTTPS URL your phone can open (the first visit shows a gate page; the password it asks for is your public IP, shown at https://loca.lt/mytunnelpassword).
 
@@ -24,7 +24,7 @@ A note on "solely on my phone": the Pages URL is public but unguessable, and the
 
 Edit `index.html` (locally and re-upload, or press the pencil icon in GitHub's web editor), commit, and Pages redeploys in under a minute. Reload on the phone — the service worker fetches pages network-first, so edits arrive on the next load; if the app is installed, fully close and reopen it. If you ever change `sw.js` or the icons, bump the `CACHE` version string at the top of `sw.js` so old caches are dropped.
 
-Bug reports to yourself: the operator's log on screen narrates everything the app does — a screenshot of it is usually the whole diagnosis.
+Bug reports to yourself: add `?debug=1` to the URL and the operator's log narrates everything the app does — a screenshot of it is usually the whole diagnosis. It's hidden by default so customers only ever see Capture and Ticket.
 
 Fast lane for Android sessions (optional, skips deploying): connect the phone by USB, enable USB debugging, open `chrome://inspect#devices` on the PC, add a port forward `8080 → localhost:8080`, run the local server, and browse to `localhost:8080` on the phone. That counts as a secure context, so the mic works with zero deploys. iPhone has no Mac-free equivalent — but with sub-minute Pages deploys you will not miss it.
 
@@ -54,7 +54,7 @@ function gateOK(){return true}       // store build: paid upfront, no key gate
 
 (Leave `BUY_URL` empty in store builds so no external purchase link renders. Keep the web version exactly as it is.)
 
-Native WebViews have no Web Speech API; the app already detects that and switches itself to Whisper on the first recording, which is the honest engine anyway.
+Whisper is the only engine, on the web build and the wrapped one alike, so there's no WebView-specific fallback to worry about.
 
 Then: plug in your Android phone (USB debugging on) and press Run ▶ in Android Studio — the real native app installs on your phone. That is your native test loop; after web edits run `npx cap sync` and Run again. When it feels right: Build → Generate Signed App Bundle (create a keystore, let Play App Signing manage the rest), then in Play Console create the app, upload the AAB to the Internal testing track (instant, shareable link, up to 100 testers), fill the Data safety form — genuinely pleasant for this app: microphone processed on-device, no data collected, no data shared — plus a content rating questionnaire and a privacy policy URL (a PRIVACY page on your Pages site is fine). Promote Internal → Production when ready. First reviews typically take a few days; Google's cut on a paid app is 15% up to $1M/yr.
 

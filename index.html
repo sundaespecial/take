@@ -5,8 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>TAKE · Dictation Instrument</title>
 <link rel="manifest" href="manifest.webmanifest">
-<meta name="theme-color" content="#FBF8EF" media="(prefers-color-scheme: light)">
-<meta name="theme-color" content="#171009" media="(prefers-color-scheme: dark)">
+<meta name="theme-color" content="#F6F1E6" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0E0B09" media="(prefers-color-scheme: dark)">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <link rel="icon" href="icon-192.png">
@@ -16,155 +16,160 @@
 <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700&family=Archivo+Black&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
   :root{
-    --faceplate:#FBF8EF;
-    --panel:#F1EBDB;
-    --ink:#171410;
-    --ink-soft:#6E6558;
-    --pilot:#F2A007;
-    --pilot-deep:#C97F00;
-    --pine:#12594A;
-    --pine-lit:#2E8570;
-    --walnut:#6B4526;
+    /* material tokens — light finish: honey walnut + champagne aluminum */
+    --wood-a:#C08A4E; --wood-b:#7A4A22;
+    --metal-a:#F3EAD7; --metal-b:#CBB99B;
+    --display:#F6F7F4; --display-ink:#171B22;
+    --ink:#171B22; --ink-soft:#5B5648;
+    --pilot:#F2A007; --pilot-deep:#C97F00;
+    --pine:#12594A; --pine-lit:#2E8570;
     --oxblood:#8E2B3A;
-    --hair:#171410;
-    --shell:#6B4526;
-    --shadow:#171410;
+    --hair:rgba(23,20,16,.78);
+    --shadow-edge:rgba(23,20,16,.55);
+    --shadow-soft:rgba(30,20,10,.28);
     --paper:#FFFDF6;
     --on-accent:#FBF8EF;
-    --grille-line:#171410;
+    --grille-line:rgba(23,20,16,.16);
+    --glow-c:rgba(242,160,7,.35);
+    --live-c:var(--oxblood);
   }
-  /* burst — ebony shell, rosewood panels, cream binding, amber pilot */
   [data-theme="dark"]{
     color-scheme:dark;
-    --faceplate:#171009;
-    --panel:#241A10;
-    --ink:#F2E7D3;
-    --ink-soft:#A6947A;
-    --pilot:#F5A623;
-    --pilot-deep:#D98C0A;
-    --pine:#2E8570;
-    --pine-lit:#3FA98C;
-    --walnut:#B08050;
+    /* material tokens — dark finish: smoked walnut + blackened aluminum */
+    --wood-a:#4A3018; --wood-b:#1E140A;
+    --metal-a:#38352F; --metal-b:#18160F;
+    --display:#0E0B09; --display-ink:#F3F0E6;
+    --ink:#F3F0E6; --ink-soft:#A79A82;
+    --pilot:#F5A623; --pilot-deep:#D98C0A;
+    --pine:#2E8570; --pine-lit:#3FA98C;
     --oxblood:#C25B6C;
-    --hair:#E7D5AC;
-    --shell:#0F0A06;
-    --shadow:#000000;
-    --paper:#2B1F10;
-    --grille-line:rgba(231,213,172,.3);
+    --hair:rgba(243,240,230,.28);
+    --shadow-edge:rgba(0,0,0,.7);
+    --shadow-soft:rgba(0,0,0,.55);
+    --paper:#211A10;
+    --grille-line:rgba(243,240,230,.14);
+    --glow-c:rgba(245,166,35,.28);
   }
+  [data-wave="bw"]{ --live-c:var(--ink); --glow-c:rgba(120,120,120,.28) }
+  [data-wave="amber"]{ --live-c:var(--pilot-deep); --glow-c:rgba(242,160,7,.35) }
+  [data-wave="rainbow"]{ --live-c:var(--oxblood); --glow-c:rgba(242,160,7,.35) }
+
   *{box-sizing:border-box;margin:0;padding:0}
   html{-webkit-text-size-adjust:100%}
   body{
-    background:var(--faceplate);
+    background:linear-gradient(175deg,var(--wood-a) 0%,var(--wood-b) 120%);
     color:var(--ink);
     font-family:'Archivo',system-ui,sans-serif;
     font-size:15px;
     line-height:1.5;
-    padding:24px 20px 64px;
+    padding:20px 16px 56px;
+    min-height:100vh;
   }
-  .wrap{max-width:1240px;margin:0 auto}
+  .wrap{max-width:640px;margin:0 auto}
+  @media(min-width:860px){.wrap{max-width:900px}}
+
+  .enclosure{
+    background:linear-gradient(160deg,var(--wood-a),var(--wood-b));
+    border:1px solid var(--shadow-edge);
+    border-radius:18px;
+    box-shadow:0 1px 2px var(--shadow-soft),0 18px 34px -18px var(--shadow-soft),3px 3px 0 var(--shadow-edge);
+    padding:10px;
+  }
 
   /* faceplate header */
   .bar{
-    display:flex;align-items:stretch;gap:0;
-    border:2px solid var(--hair);
-    background:var(--faceplate);
-    box-shadow:5px 5px 0 var(--shadow);
-    margin-bottom:34px;
+    display:flex;align-items:stretch;gap:10px;
+    background:linear-gradient(170deg,var(--metal-a),var(--metal-b));
+    border:1px solid var(--hair);
+    border-radius:12px;
+    padding:0;
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.35),0 1px 2px var(--shadow-soft);
+    margin-bottom:14px;
   }
   .mark{
-    padding:16px 20px;display:flex;align-items:center;gap:14px;
-    border-right:2px solid var(--hair);flex:1;
+    padding:13px 16px;display:flex;align-items:center;gap:12px;flex:1;min-width:0;
   }
   .mark h1{
     font-family:'Archivo Black','Archivo',sans-serif;
-    font-size:26px;letter-spacing:-.055em;line-height:1;
+    font-size:22px;letter-spacing:-.05em;line-height:1;color:var(--display-ink);
   }
   .mark .sub{
-    font-family:'IBM Plex Mono',monospace;font-size:10px;
-    letter-spacing:.16em;color:var(--ink-soft);text-transform:uppercase;
+    font-family:'IBM Plex Mono',monospace;font-size:9.5px;
+    letter-spacing:.14em;color:var(--ink-soft);text-transform:uppercase;
   }
   .lamps{display:flex;gap:5px;align-items:center}
-  .lamp{width:9px;height:9px;border:1.5px solid var(--ink);background:var(--panel)}
-  .lamp.on{background:var(--pilot)}
-  .lamp.hot{background:var(--oxblood)}
-  .modes{display:flex}
-  .mode{
-    font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.14em;
-    text-transform:uppercase;padding:0 22px;background:var(--panel);
-    border:none;border-left:2px solid var(--hair);color:var(--ink-soft);
-    cursor:pointer;font-weight:600;
+  .lamp{width:8px;height:8px;border-radius:50%;border:1px solid var(--hair);background:rgba(0,0,0,.12);box-shadow:inset 0 1px 1px rgba(0,0,0,.25)}
+  .lamp.on{background:var(--pilot);box-shadow:0 0 6px var(--pilot)}
+  .lamp.hot{background:var(--live-c);box-shadow:0 0 6px var(--live-c)}
+  .headctl{display:flex;align-items:center;gap:6px;padding:0 12px}
+  .gear{
+    width:34px;height:34px;border-radius:50%;border:1px solid var(--hair);
+    background:linear-gradient(160deg,var(--metal-a),var(--metal-b));
+    color:var(--ink-soft);font-size:16px;cursor:pointer;flex:0 0 auto;
+    box-shadow:0 1px 2px var(--shadow-soft);
   }
-  .mode[aria-pressed="true"]{background:var(--pine);color:var(--on-accent)}
+  .gear:hover{color:var(--ink)}
+  .pill{
+    font-family:'IBM Plex Mono',monospace;font-size:9.5px;letter-spacing:.08em;text-transform:uppercase;
+    padding:5px 9px;border-radius:20px;border:1px solid var(--hair);background:var(--paper);color:var(--ink-soft);
+    cursor:pointer;white-space:nowrap;
+  }
+  .pill.armed{background:var(--pine);color:var(--on-accent);border-color:var(--pine)}
+  .instbtn{display:none}
 
-  /* stage */
-  .stage{display:grid;grid-template-columns:minmax(0,340px) minmax(0,1fr);gap:38px;align-items:start}
-  @media(max-width:860px){.stage{grid-template-columns:1fr}}
-
-  .device{
-    background:var(--shell);
-    border:2px solid var(--hair);
-    box-shadow:6px 6px 0 var(--shadow);
-    padding:14px;
-    width:100%;max-width:340px;
-  }
-  .device .cheek{
-    height:7px;background:var(--faceplate);border:2px solid var(--hair);margin-bottom:12px;
-  }
-  .device .cheek.b{margin:12px 0 0}
+  /* device shell */
+  .device{max-width:420px;margin:0 auto}
   .screen{
-    background:var(--faceplate);border:2px solid var(--hair);
-    height:640px;display:flex;flex-direction:column;overflow:hidden;position:relative;
+    background:radial-gradient(140% 160% at 15% -20%,rgba(255,255,255,.5),transparent 55%),var(--display);
+    border:1px solid var(--hair);border-radius:14px;
+    box-shadow:0 0 46px -14px var(--glow-c),inset 0 1px 0 rgba(255,255,255,.25);
+    min-height:560px;display:flex;flex-direction:column;overflow:hidden;position:relative;
   }
 
   .statusbar{
     display:flex;justify-content:space-between;align-items:center;gap:8px;
-    padding:9px 12px;border-bottom:2px solid var(--hair);
-    font-family:'IBM Plex Mono',monospace;font-size:9.5px;letter-spacing:.11em;
-    text-transform:uppercase;background:var(--panel);
+    padding:9px 14px;border-bottom:1px solid var(--hair);
+    font-family:'IBM Plex Mono',monospace;font-size:9.5px;letter-spacing:.1em;
+    text-transform:uppercase;color:var(--ink-soft);
   }
   .airplane{display:flex;align-items:center;gap:6px;font-weight:600;min-width:0}
   .airplane span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-  .dot{width:7px;height:7px;background:var(--pine);border:1.5px solid var(--ink);flex:0 0 auto}
-  .dot.live{background:var(--oxblood)}
+  .dot{width:7px;height:7px;border-radius:50%;background:var(--pine);flex:0 0 auto}
+  .dot.live{background:var(--live-c);box-shadow:0 0 6px var(--live-c)}
 
   .body{flex:1;overflow-y:auto;display:flex;flex-direction:column}
   .body::-webkit-scrollbar{width:4px}
   .body::-webkit-scrollbar-thumb{background:var(--ink-soft)}
 
   .eyebrow{
-    font-family:'IBM Plex Mono',monospace;font-size:9.5px;letter-spacing:.16em;
+    font-family:'IBM Plex Mono',monospace;font-size:9.5px;letter-spacing:.15em;
     text-transform:uppercase;color:var(--ink-soft);font-weight:600;
   }
 
   /* grille + meter */
   .grille{
-    background:
-      repeating-linear-gradient(to bottom,var(--grille-line) 0 1px,transparent 1px 5px),
-      var(--panel);
-    border-bottom:2px solid var(--hair);
-    padding:20px 16px 16px;position:relative;
+    background:linear-gradient(170deg,var(--metal-a),var(--metal-b));
+    border-bottom:1px solid var(--hair);
+    padding:16px 14px 14px;position:relative;
   }
-  .meterhead{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:12px}
-  .meterhead .eyebrow{background:var(--panel);padding:2px 5px}
+  .meterhead{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:10px}
   .clock{
-    font-family:'IBM Plex Mono',monospace;font-size:26px;font-weight:600;
-    letter-spacing:-.02em;background:var(--panel);padding:0 6px;
+    font-family:'IBM Plex Mono',monospace;font-size:23px;font-weight:600;
+    letter-spacing:-.02em;color:var(--ink);
   }
-  .vu{display:flex;gap:3px;align-items:flex-end;height:56px;background:var(--faceplate);
-      border:2px solid var(--hair);padding:6px}
-  .seg{flex:1;background:var(--panel);border:1px solid var(--ink);height:8%;transition:height .07s linear}
-  .seg.lit{background:var(--pilot)}
-  .seg.peak{background:var(--oxblood)}
+  .vu{display:flex;gap:2.5px;align-items:flex-end;height:50px;background:var(--display);
+      border-radius:8px;border:1px solid var(--hair);padding:6px}
+  .seg{flex:1;background:rgba(120,120,120,.18);border-radius:2px;height:8%;transition:height .07s linear}
+  .seg.lit{background:var(--seg-c,var(--pilot))}
+  .seg.peak{filter:brightness(1.3) saturate(1.15)}
   .scale{
     display:flex;justify-content:space-between;margin-top:5px;
     font-family:'IBM Plex Mono',monospace;font-size:8.5px;color:var(--ink-soft);
-    background:var(--panel);
   }
 
   /* transcript */
-  .live{padding:16px;flex:1;min-height:120px}
-  .live .eyebrow{margin-bottom:9px;display:block}
+  .live{padding:14px;flex:1;min-height:110px}
+  .live .eyebrow{margin-bottom:8px;display:block}
   .caret{display:inline-block;width:7px;height:15px;background:var(--pilot);
          vertical-align:-2px;margin-left:2px}
   .caret.off{display:none}
@@ -172,79 +177,78 @@
   #tint{color:var(--ink-soft)}
   .placeholder{color:var(--ink-soft);font-size:13.5px;line-height:1.6}
 
-  .tray{padding:12px 16px 14px;border-top:2px solid var(--hair);background:var(--panel)}
+  .tray{padding:12px 14px 14px;border-top:1px solid var(--hair);background:linear-gradient(170deg,var(--metal-a),var(--metal-b))}
   .chip{
     display:inline-block;font-family:'IBM Plex Mono',monospace;font-size:9.5px;
-    letter-spacing:.09em;text-transform:uppercase;border:1.5px solid var(--ink);
-    padding:4px 7px;background:var(--faceplate);font-weight:600;margin:0 4px 4px 0;
+    letter-spacing:.08em;text-transform:uppercase;border:1px solid var(--hair);border-radius:20px;
+    padding:4px 9px;background:var(--paper);font-weight:600;margin:0 4px 4px 0;
     color:var(--ink);
   }
   button.chip{cursor:pointer}
   button.chip:disabled{opacity:.45;cursor:not-allowed}
   .chip.armed{background:var(--pine);color:var(--on-accent);border-color:var(--pine)}
-  .chip.eng[aria-pressed="true"]{background:var(--pilot);border-color:var(--ink)}
-  .ws{border-bottom:1.5px dotted var(--ink);outline:none;padding:0 2px;cursor:text}
-  .ws:focus{background:var(--pilot);border-bottom-color:transparent}
-  .ws:empty::before{content:'unnamed';color:var(--ink-soft)}
 
   .rec-row{display:flex;align-items:center;gap:14px;margin-top:10px}
   .rec{
-    width:66px;height:66px;flex:0 0 66px;border:2px solid var(--ink);
-    background:var(--pilot);cursor:pointer;box-shadow:4px 4px 0 var(--shadow);
+    width:66px;height:66px;flex:0 0 66px;border-radius:50%;
+    border:1px solid var(--hair);
+    background:radial-gradient(circle at 35% 30%,#ffce6b,var(--pilot) 55%,var(--pilot-deep) 100%);
+    cursor:pointer;box-shadow:0 3px 0 var(--pilot-deep),0 6px 14px -4px var(--shadow-soft);
     display:flex;align-items:center;justify-content:center;
-    font-family:'Archivo Black',sans-serif;font-size:12px;letter-spacing:-.02em;
-    transition:transform .06s,box-shadow .06s;color:var(--ink);
+    font-family:'Archivo Black',sans-serif;font-size:11px;letter-spacing:-.02em;
+    transition:transform .06s,box-shadow .06s;color:#3a2400;
   }
-  .rec:active{transform:translate(4px,4px);box-shadow:0 0 0 var(--shadow)}
-  .rec.live{background:var(--oxblood);color:var(--on-accent)}
+  .rec:active{transform:translateY(2px);box-shadow:0 1px 0 var(--pilot-deep)}
+  .rec.live{background:radial-gradient(circle at 35% 30%,#ff9d8a,var(--live-c) 55%,var(--oxblood) 100%);color:var(--on-accent);
+    box-shadow:0 3px 0 var(--oxblood),0 0 22px -2px var(--live-c)}
   .rec-note{font-family:'IBM Plex Mono',monospace;font-size:10px;line-height:1.5;color:var(--ink-soft)}
-  .prog{height:8px;border:1.5px solid var(--ink);background:var(--faceplate);margin-top:9px;display:none}
+  .prog{height:6px;border-radius:6px;background:rgba(120,120,120,.2);margin-top:9px;display:none;overflow:hidden}
   .prog i{display:block;height:100%;background:var(--pilot);width:0%}
 
-  /* review */
-  .pad{padding:16px}
+  /* review / ticket */
+  .pad{padding:14px}
   .screentitle{
-    font-family:'Archivo Black',sans-serif;font-size:17px;letter-spacing:-.03em;
-    text-transform:uppercase;margin:2px 0 14px;
+    font-family:'Archivo Black',sans-serif;font-size:16px;letter-spacing:-.03em;
+    text-transform:uppercase;margin:2px 0 12px;
   }
-  .field{border:2px solid var(--hair);margin-bottom:9px;background:var(--faceplate)}
+  .field{border:1px solid var(--hair);border-radius:10px;margin-bottom:8px;background:var(--display);overflow:hidden}
   .field .fhead{
     display:flex;justify-content:space-between;align-items:center;gap:8px;
-    padding:5px 8px;border-bottom:1.5px solid var(--ink);background:var(--panel);
+    padding:5px 9px;border-bottom:1px solid var(--hair);background:rgba(120,120,120,.08);
   }
-  .field .val{padding:8px;font-size:14px;outline:none;min-height:34px}
+  .field .val{padding:8px 9px;font-size:14px;outline:none;min-height:34px}
   .field .val:focus{background:var(--paper);box-shadow:inset 0 0 0 2px var(--pine)}
   .field .val:empty::before{content:attr(data-ph);color:var(--ink-soft);font-style:italic}
   .tag{
     font-family:'IBM Plex Mono',monospace;font-size:8.5px;letter-spacing:.1em;
-    text-transform:uppercase;padding:2px 5px;border:1.5px solid var(--ink);font-weight:600;
+    text-transform:uppercase;padding:2px 6px;border-radius:10px;border:1px solid var(--hair);font-weight:600;
   }
   .tag.you{background:var(--oxblood);color:var(--on-accent);border-color:var(--oxblood)}
   .tag.check{background:var(--pilot)}
-  .tag.pin{cursor:pointer;background:var(--faceplate)}
-  .tag.pin.on{background:var(--pine);color:var(--on-accent);border-color:var(--pine)}
   .empty{color:var(--ink-soft);font-style:italic}
 
   .verdict{
-    border:2px solid var(--hair);background:var(--panel);padding:10px;margin:14px 0 10px;
+    border:1px solid var(--hair);border-radius:10px;background:rgba(120,120,120,.08);padding:10px;margin:12px 0 10px;
     font-family:'IBM Plex Mono',monospace;font-size:10.5px;line-height:1.6;
   }
   .verdict b{font-weight:600}
 
   .act{
-    width:100%;border:2px solid var(--ink);background:var(--pine);color:var(--on-accent);
-    font-family:'Archivo Black',sans-serif;font-size:13px;letter-spacing:.02em;
-    text-transform:uppercase;padding:14px;cursor:pointer;box-shadow:4px 4px 0 var(--shadow);
+    width:100%;border:1px solid var(--hair);border-radius:10px;background:var(--pine);color:var(--on-accent);
+    font-family:'Archivo Black',sans-serif;font-size:12.5px;letter-spacing:.02em;
+    text-transform:uppercase;padding:13px;cursor:pointer;box-shadow:0 2px 0 rgba(0,0,0,.2);
     transition:transform .06s,box-shadow .06s;
   }
-  .act:active{transform:translate(4px,4px);box-shadow:0 0 0 var(--shadow)}
-  .act.ghost{background:var(--faceplate);color:var(--ink)}
+  .act:active{transform:translateY(2px);box-shadow:0 0 0 rgba(0,0,0,.2)}
+  .act.ghost{background:var(--display);color:var(--ink);border:1px solid var(--hair)}
   .act.sm{padding:9px;font-size:11px}
   .act:disabled{opacity:.45;cursor:not-allowed}
+  .actrow{display:flex;gap:8px;margin-top:10px}
+  .actrow .act{flex:1}
 
-  /* ticket */
+  /* ticket text */
   .ticket{
-    border:2px solid var(--hair);background:var(--faceplate);padding:12px;
+    border:1px solid var(--hair);border-radius:10px;background:var(--display);padding:12px;
     font-family:'IBM Plex Mono',monospace;font-size:11.5px;line-height:1.72;
     white-space:pre-wrap;word-break:break-word;
   }
@@ -253,69 +257,40 @@
     text-transform:uppercase;color:var(--ink-soft);margin:11px 0 2px;font-weight:600;
   }
   .ticket h4:first-child{margin-top:0}
-  .targets{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-top:9px}
-  .target{
-    border:2px solid var(--ink);background:var(--faceplate);padding:9px 7px;cursor:pointer;
-    font-family:'IBM Plex Mono',monospace;font-size:9.5px;letter-spacing:.06em;
-    text-transform:uppercase;font-weight:600;text-align:left;transition:background .1s;
-  }
-  .target:hover{background:var(--panel)}
-  .target span{display:block;font-size:8px;color:var(--ink-soft);letter-spacing:.04em;margin-top:2px}
+  .ticket.narrative{font-family:'Archivo',sans-serif;font-size:13.5px;line-height:1.65;white-space:normal}
 
   .toast{
     position:absolute;left:12px;right:12px;bottom:12px;background:var(--ink);
-    color:var(--faceplate);padding:10px 12px;font-family:'IBM Plex Mono',monospace;
-    font-size:10px;line-height:1.5;letter-spacing:.04em;
+    color:var(--display);padding:10px 12px;border-radius:10px;font-family:'IBM Plex Mono',monospace;
+    font-size:10px;line-height:1.5;letter-spacing:.03em;
     opacity:0;transform:translateY(8px);transition:opacity .18s,transform .18s;pointer-events:none;
     z-index:5;
   }
   .toast.up{opacity:1;transform:translateY(0)}
 
-  /* desk */
-  .desk{
-    background:var(--panel);border:2px solid var(--hair);box-shadow:6px 6px 0 var(--shadow);
-    width:100%;max-width:340px;
-  }
-  .deskbar{
-    display:flex;align-items:center;gap:7px;padding:8px 10px;border-bottom:2px solid var(--hair);
-    font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:.09em;text-transform:uppercase;
-  }
-  .deskbar .u{flex:1;background:var(--faceplate);border:1.5px solid var(--ink);padding:3px 6px;
-              overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-  .deskbody{background:var(--faceplate);padding:14px;height:592px;overflow-y:auto;position:relative}
-  .card{border:2px solid var(--hair);margin-bottom:9px;background:var(--faceplate)}
-  .card .ch{display:flex;justify-content:space-between;align-items:center;gap:6px;padding:5px 8px;background:var(--panel);
-            border-bottom:1.5px solid var(--ink);
-            font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:.1em;text-transform:uppercase}
-  .card .cb{padding:9px;font-size:13px;line-height:1.55}
-  .locked{background:var(--panel);color:var(--ink-soft)}
-  .passfield{width:100%;border:2px solid var(--hair);padding:10px;font-family:'IBM Plex Mono',monospace;
-             font-size:13px;background:var(--paper);margin-bottom:9px}
-  .imp textarea{width:100%;height:62px;border:2px solid var(--hair);font-family:'IBM Plex Mono',monospace;
-                font-size:10px;padding:6px;background:var(--paper);margin-bottom:7px;resize:vertical}
-  .cbtns{display:flex;gap:6px;margin-top:8px}
-  .cbtns .act{padding:8px;font-size:10px}
-
-  /* transport */
-  .transport{display:flex;margin-top:26px;border:2px solid var(--hair);box-shadow:5px 5px 0 var(--shadow);max-width:340px}
+  /* bottom transport — Capture / Ticket only */
+  .transport{display:flex;margin-top:16px;border-radius:12px;overflow:hidden;border:1px solid var(--hair);
+    background:linear-gradient(170deg,var(--metal-a),var(--metal-b));max-width:420px;margin-left:auto;margin-right:auto;
+    box-shadow:0 1px 2px var(--shadow-soft)}
   .tbtn{
-    flex:1;background:var(--faceplate);border:none;border-right:2px solid var(--hair);
-    padding:11px 4px;cursor:pointer;font-family:'IBM Plex Mono',monospace;font-size:9px;
+    flex:1;background:transparent;border:none;
+    padding:11px 4px;cursor:pointer;font-family:'IBM Plex Mono',monospace;font-size:10px;
     letter-spacing:.09em;text-transform:uppercase;font-weight:600;color:var(--ink-soft);
   }
-  .tbtn:last-child{border-right:none}
-  .tbtn[aria-pressed="true"]{background:var(--pilot);color:var(--ink)}
+  .tbtn[aria-pressed="true"]{background:var(--pilot);color:#3a2400}
 
-  /* operator's log panel */
-  .notes{border-left:3px solid var(--walnut);padding-left:22px}
+  /* debug: operator's log panel */
+  #debugPane{display:none;margin-top:22px}
+  #debugPane.on{display:block}
+  .notes{border-left:3px solid var(--pilot-deep);padding-left:18px}
   .notes h2{
-    font-family:'Archivo Black',sans-serif;font-size:22px;letter-spacing:-.04em;
+    font-family:'Archivo Black',sans-serif;font-size:20px;letter-spacing:-.04em;
     text-transform:uppercase;margin-bottom:5px;
   }
-  .notes .lead{font-size:14.5px;color:var(--ink-soft);margin-bottom:18px;max-width:58ch;line-height:1.6}
-  .pipe{border:2px solid var(--hair);background:var(--faceplate);margin-bottom:16px;max-width:560px}
+  .notes .lead{font-size:14px;color:var(--ink-soft);margin-bottom:16px;max-width:58ch;line-height:1.6}
+  .pipe{border:1px solid var(--hair);border-radius:10px;background:var(--display);margin-bottom:14px;max-width:560px}
   .pipe .pr{display:flex;justify-content:space-between;gap:12px;padding:6px 10px;
-            border-bottom:1.5px solid var(--panel);
+            border-bottom:1px solid var(--hair);
             font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.05em}
   .pipe .pr:last-child{border-bottom:none}
   .pipe .pk{color:var(--ink-soft);text-transform:uppercase;font-weight:600;flex:0 0 auto}
@@ -323,7 +298,7 @@
   .pv.ok{color:var(--pine)}
   .pv.warn{color:var(--pilot-deep)}
   .pv.bad{color:var(--oxblood)}
-  #log{border:2px solid var(--hair);background:var(--faceplate);height:320px;overflow-y:auto;
+  #log{border:1px solid var(--hair);border-radius:10px;background:var(--display);height:280px;overflow-y:auto;
        padding:9px;max-width:560px}
   .le{font-family:'IBM Plex Mono',monospace;font-size:10px;line-height:1.55;margin-bottom:6px;
       display:flex;gap:8px;align-items:baseline}
@@ -331,96 +306,133 @@
   .le.good{color:var(--pine)}
   .le.warn{color:var(--pilot-deep)}
   .le.bad{color:var(--oxblood)}
-  .foot{font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:.1em;text-transform:uppercase;
-        color:var(--ink-soft);margin-top:12px}
 
-  /* passphrase modal */
-  .modal{position:fixed;inset:0;background:rgba(23,20,16,.45);display:none;
+  /* modals (settings, share, passphrase, license) */
+  .modal{position:fixed;inset:0;background:rgba(10,8,6,.5);display:none;
          align-items:center;justify-content:center;z-index:50;padding:20px}
   .modal.up{display:flex}
-  .mbox{background:var(--faceplate);border:2px solid var(--hair);box-shadow:6px 6px 0 var(--shadow);
-        padding:18px;width:min(94vw,380px)}
+  .mbox{background:linear-gradient(170deg,var(--metal-a),var(--metal-b));border:1px solid var(--hair);border-radius:14px;
+        box-shadow:0 20px 40px -16px rgba(0,0,0,.5);
+        padding:18px;width:min(94vw,400px);max-height:88vh;overflow-y:auto}
   .mbox h3{font-family:'Archivo Black',sans-serif;text-transform:uppercase;font-size:15px;
-           letter-spacing:-.02em;margin-bottom:6px}
+           letter-spacing:-.02em;margin-bottom:6px;color:var(--display-ink)}
   .mbox p{font-size:13px;color:var(--ink-soft);margin-bottom:12px;line-height:1.55}
-  .mbox input{width:100%;border:2px solid var(--hair);padding:10px;font-family:'IBM Plex Mono',monospace;
-              font-size:13px;background:var(--paper);margin-bottom:12px}
+  .mbox input,.mbox textarea{width:100%;border:1px solid var(--hair);border-radius:8px;padding:10px;font-family:'IBM Plex Mono',monospace;
+              font-size:13px;background:var(--paper);margin-bottom:12px;color:var(--ink)}
+  .mbox textarea{height:84px;resize:vertical}
   .mrow{display:flex;gap:9px}
-  .mbox textarea{width:100%;height:84px;border:2px solid var(--hair);font-family:'IBM Plex Mono',monospace;
-                 font-size:10.5px;padding:8px;background:var(--paper);margin-bottom:12px;resize:vertical}
+  .settgroup{margin-bottom:16px}
+  .settgroup .eyebrow{display:block;margin-bottom:8px}
+  .choices{display:flex;gap:7px;flex-wrap:wrap}
+  .choice{
+    font-family:'IBM Plex Mono',monospace;font-size:10.5px;letter-spacing:.05em;text-transform:uppercase;
+    padding:8px 12px;border-radius:20px;border:1px solid var(--hair);background:var(--paper);color:var(--ink);cursor:pointer;
+  }
+  .choice[aria-pressed="true"]{background:var(--pine);color:var(--on-accent);border-color:var(--pine)}
+  .warnbox{border:1px solid var(--oxblood);border-radius:10px;padding:10px;font-size:12.5px;color:var(--oxblood);margin-bottom:12px;line-height:1.5}
+  .linkbox{word-break:break-all;font-family:'IBM Plex Mono',monospace;font-size:11px;background:var(--paper);border:1px solid var(--hair);
+    border-radius:8px;padding:10px;margin-bottom:12px}
 
-  /* schematic */
+  /* schematic (debug only) */
   #schematic{display:none}
   #schematic.on{display:block}
   #device-view.off{display:none}
   .schemhead{margin-bottom:22px;max-width:70ch}
-  .schemhead h2{font-family:'Archivo Black',sans-serif;font-size:26px;letter-spacing:-.04em;text-transform:uppercase}
+  .schemhead h2{font-family:'Archivo Black',sans-serif;font-size:24px;letter-spacing:-.04em;text-transform:uppercase}
   .schemhead p{color:var(--ink-soft);margin-top:6px}
-  .svgwrap{border:2px solid var(--hair);box-shadow:6px 6px 0 var(--shadow);background:#FBF8EF;padding:14px;overflow-x:auto}
+  .svgwrap{border:1px solid var(--hair);border-radius:12px;background:#FBF8EF;padding:14px;overflow-x:auto}
   svg{display:block;width:100%;min-width:900px;height:auto}
-  .costs{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:0;margin-top:34px;border:2px solid var(--hair);box-shadow:5px 5px 0 var(--shadow)}
-  .cost{padding:15px;border-right:2px solid var(--hair)}
+  .costs{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:0;margin-top:28px;border:1px solid var(--hair);border-radius:12px;overflow:hidden}
+  .cost{padding:15px;border-right:1px solid var(--hair);background:var(--display)}
   .cost:last-child{border-right:none}
   .cost .k{font-family:'IBM Plex Mono',monospace;font-size:9.5px;letter-spacing:.13em;text-transform:uppercase;color:var(--ink-soft);font-weight:600}
-  .cost .v{font-family:'Archivo Black',sans-serif;font-size:27px;letter-spacing:-.04em;margin:5px 0 4px}
+  .cost .v{font-family:'Archivo Black',sans-serif;font-size:25px;letter-spacing:-.04em;margin:5px 0 4px}
   .cost .d{font-size:13px;line-height:1.5;color:var(--ink-soft)}
-  @media(max-width:700px){.cost{border-right:none;border-bottom:2px solid var(--hair)}.cost:last-child{border-bottom:none}}
+  @media(max-width:700px){.cost{border-right:none;border-bottom:1px solid var(--hair)}.cost:last-child{border-bottom:none}}
+
+  /* legal-pad receiver — deliberately its own look, not the instrument chrome */
+  #receiver{display:none}
+  #receiver.on{display:block}
+  body.receiving{background:#F4E9C4}
+  [data-theme="dark"] body.receiving{background:#2A2210}
+  .padwrap{max-width:560px;margin:40px auto;padding:0 16px}
+  .padtitle{font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.16em;text-transform:uppercase;
+    color:#8a7a4a;margin-bottom:14px}
+  .padsheet{
+    position:relative;background:#FBF3D0;
+    background-image:repeating-linear-gradient(to bottom,transparent 0,transparent 29px,rgba(70,110,180,.35) 30px);
+    background-position:0 8px;
+    border-radius:2px;box-shadow:0 10px 30px -12px rgba(0,0,0,.4),0 1px 1px rgba(0,0,0,.2);
+    padding:20px 20px 20px 46px;min-height:300px;
+  }
+  [data-theme="dark"] .padsheet{background:#332911;background-image:repeating-linear-gradient(to bottom,transparent 0,transparent 29px,rgba(120,150,210,.25) 30px)}
+  .padsheet::before{content:'';position:absolute;top:0;bottom:0;left:34px;width:1px;background:rgba(190,60,60,.55)}
+  .padtext{
+    font-family:'IBM Plex Mono',monospace;font-size:13.5px;line-height:30px;color:#2c2410;
+    white-space:pre-wrap;word-break:break-word;
+  }
+  [data-theme="dark"] .padtext{color:#EFE6C6}
+  .padtext:empty::before{content:'…';color:#8a7a4a}
+  .padactions{display:flex;gap:8px;margin-top:16px}
+  .padbtn{
+    font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.08em;text-transform:uppercase;
+    padding:10px 16px;border-radius:8px;border:1px solid rgba(0,0,0,.25);background:#fff8e0;color:#2c2410;
+    cursor:pointer;font-weight:600;
+  }
+  [data-theme="dark"] .padbtn{background:#4a3d1c;color:#EFE6C6;border-color:rgba(255,255,255,.2)}
+  .padpass{width:100%;max-width:280px;padding:10px;border-radius:8px;border:1px solid rgba(0,0,0,.25);
+    font-family:'IBM Plex Mono',monospace;font-size:13px;margin-bottom:10px;background:#fffef4}
 
   @media(prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
   :focus-visible{outline:3px solid var(--pine);outline-offset:2px}
+  .touch44{min-width:44px;min-height:44px}
 </style>
 </head>
 <body>
-<div class="wrap">
+
+<!-- ============ LEGAL-PAD RECEIVER (shown only when a #take= share link is opened) ============ -->
+<div id="receiver">
+  <div class="padwrap">
+    <div class="padtitle">TAKE · shared ticket</div>
+    <div id="receiverBody"></div>
+  </div>
+</div>
+
+<div class="wrap" id="mainapp">
 
   <div class="bar">
     <div class="mark">
       <div>
         <h1>TAKE</h1>
-        <div class="sub">Dictation instrument for ticket work · working prototype</div>
+        <div class="sub">Dictation instrument for ticket work</div>
       </div>
       <div class="lamps">
         <i class="lamp on" id="lampPwr" title="power"></i>
         <i class="lamp" id="lampMic" title="mic live"></i>
-        <i class="lamp" id="lampMdl" title="whisper model loaded"></i>
+        <i class="lamp" id="lampMdl" title="whisper model ready"></i>
       </div>
-      <button class="chip" id="licChip" title="License status">Trial</button>
     </div>
-    <div class="modes">
-      <button class="mode" id="m-device" aria-pressed="true">Device</button>
-      <button class="mode" id="m-schem" aria-pressed="false">Schematic</button>
-      <button class="mode" id="m-theme" aria-pressed="false">Burst</button>
-      <button class="mode" id="m-install" style="display:none">Install</button>
+    <div class="headctl">
+      <button class="pill" id="licChip" title="License status">Trial</button>
+      <button class="pill instbtn" id="m-install">Install</button>
+      <button class="gear touch44" id="btnSettings" aria-label="Settings" title="Settings">&#9881;</button>
     </div>
   </div>
 
-  <!-- ============ DEVICE ============ -->
+  <!-- ============ DEVICE (Capture / Ticket) ============ -->
   <div id="device-view">
-    <div class="stage">
-      <div>
-        <div id="hardware"></div>
-        <div class="transport" role="group" aria-label="Screens">
-          <button class="tbtn" data-s="0" aria-pressed="true">Capture</button>
-          <button class="tbtn" data-s="1" aria-pressed="false">Review</button>
-          <button class="tbtn" data-s="2" aria-pressed="false">Ticket</button>
-          <button class="tbtn" data-s="3" aria-pressed="false">Desk</button>
-        </div>
-      </div>
-      <div class="notes">
-        <h2>Operator&#8217;s log</h2>
-        <p class="lead">This page is the working instrument, not a mockup. Pick an engine, press REC, talk the way you would tell a colleague, press REC again. The transcript is parsed into fields on this machine, rendered as a ticket, and sealed with a passphrase before it touches the store. No mic? Press DEMO. Everything below is a live account of what the page is actually doing.</p>
-        <div class="pipe" id="pipe"></div>
-        <div id="log" aria-live="polite"></div>
-        <div class="foot">v0.2 · pwa · light &amp; burst finishes · plaintext never leaves this page</div>
-      </div>
+    <div id="hardware"></div>
+    <div class="transport" role="group" aria-label="Screens">
+      <button class="tbtn" data-s="0" aria-pressed="true">Capture</button>
+      <button class="tbtn" data-s="2" aria-pressed="false">Ticket</button>
     </div>
   </div>
 
-  <!-- ============ SCHEMATIC ============ -->
+  <!-- ============ SCHEMATIC (debug only, ?debug=1) ============ -->
   <div id="schematic">
     <div class="schemhead">
       <h2>Where the words live</h2>
-      <p>Plaintext exists in exactly two places. The handset, and whatever tenant the firm already trusts. Everything in between is opaque by construction, not by policy. This prototype implements the handset and the desk on one page; the relay hop is simulated by the sealed blob you can export and import on the Desk screen.</p>
+      <p>Plaintext exists in exactly two places. The handset, and whatever tenant the firm already trusts. Everything in between is opaque by construction, not by policy. This prototype implements the handset; sharing between devices is an ephemeral link carrying a sealed or plainly-encoded payload in the URL fragment — there is no relay server.</p>
     </div>
     <div class="svgwrap">
       <svg viewBox="0 0 1180 660" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Data flow schematic">
@@ -430,7 +442,6 @@
           </marker>
         </defs>
 
-        <!-- zone 1 -->
         <rect x="16" y="52" width="352" height="586" fill="#F1EBDB" stroke="#171410" stroke-width="2" stroke-dasharray="9 5"/>
         <text x="26" y="40" font-family="IBM Plex Mono,monospace" font-size="12.5" font-weight="600" letter-spacing="1.6" fill="#171410">HANDSET</text>
 
@@ -440,8 +451,8 @@
           <text x="56" y="122" font-family="IBM Plex Mono,monospace" font-size="10.5" fill="#6E6558">audio is never written to disk</text>
 
           <rect x="42" y="184" width="300" height="66" fill="#FBF8EF" stroke="#171410" stroke-width="2"/>
-          <text x="56" y="210" font-size="15" font-weight="700" fill="#171410">whisper.cpp</text>
-          <text x="56" y="230" font-family="IBM Plex Mono,monospace" font-size="10.5" fill="#6E6558">small q5 · 190 MB · same on both OSes</text>
+          <text x="56" y="210" font-size="15" font-weight="700" fill="#171410">Whisper (on-device)</text>
+          <text x="56" y="230" font-family="IBM Plex Mono,monospace" font-size="10.5" fill="#6E6558">whisper-tiny.en · only speech engine · offline after first load</text>
 
           <rect x="42" y="292" width="300" height="66" fill="#FBF8EF" stroke="#171410" stroke-width="2"/>
           <text x="56" y="318" font-size="15" font-weight="700" fill="#171410">Field extractor</text>
@@ -449,11 +460,11 @@
 
           <rect x="42" y="400" width="300" height="66" fill="#FBF8EF" stroke="#171410" stroke-width="2"/>
           <text x="56" y="426" font-size="15" font-weight="700" fill="#171410">Template renderer</text>
-          <text x="56" y="446" font-family="IBM Plex Mono,monospace" font-size="10.5" fill="#6E6558">deterministic · your house style</text>
+          <text x="56" y="446" font-family="IBM Plex Mono,monospace" font-size="10.5" fill="#6E6558">narrative house style, falls back to fields when facts are missing</text>
 
           <rect x="42" y="508" width="300" height="66" fill="#12594A" stroke="#171410" stroke-width="2"/>
-          <text x="56" y="534" font-size="15" font-weight="700" fill="#FBF8EF">AES-GCM seal</text>
-          <text x="56" y="554" font-family="IBM Plex Mono,monospace" font-size="10.5" fill="#F1EBDB">key derived from passphrase, stays here</text>
+          <text x="56" y="534" font-size="15" font-weight="700" fill="#FBF8EF">Share link (optional)</text>
+          <text x="56" y="554" font-family="IBM Plex Mono,monospace" font-size="10.5" fill="#F1EBDB">AES-GCM sealed, or plain — your choice, in the URL fragment</text>
         </g>
 
         <g stroke="#171410" stroke-width="2" marker-end="url(#ar)">
@@ -469,58 +480,28 @@
           <text x="202" y="491">ticket text</text>
         </g>
 
-        <!-- zone 2 -->
         <rect x="416" y="52" width="248" height="586" fill="#FBF8EF" stroke="#171410" stroke-width="2" stroke-dasharray="9 5"/>
-        <text x="426" y="40" font-family="IBM Plex Mono,monospace" font-size="12.5" font-weight="600" letter-spacing="1.6" fill="#171410">RELAY</text>
-        <rect x="442" y="286" width="196" height="118" fill="#171410" stroke="#171410" stroke-width="2"/>
-        <text x="458" y="318" font-family="Archivo,sans-serif" font-size="15" font-weight="700" fill="#FBF8EF">Ciphertext store</text>
-        <text x="458" y="340" font-family="IBM Plex Mono,monospace" font-size="10.5" fill="#F1EBDB">~3 KB per take</text>
-        <text x="458" y="358" font-family="IBM Plex Mono,monospace" font-size="10.5" fill="#F1EBDB">30 day hard TTL</text>
-        <text x="458" y="376" font-family="IBM Plex Mono,monospace" font-size="10.5" fill="#F1EBDB">no filenames, no metadata</text>
-        <text x="426" y="440" font-family="IBM Plex Mono,monospace" font-size="11" fill="#8E2B3A" font-weight="600">we cannot read this,</text>
-        <text x="426" y="456" font-family="IBM Plex Mono,monospace" font-size="11" fill="#8E2B3A" font-weight="600">and neither can a subpoena</text>
+        <text x="426" y="40" font-family="IBM Plex Mono,monospace" font-size="12.5" font-weight="600" letter-spacing="1.6" fill="#171410">NO RELAY</text>
+        <text x="426" y="300" font-family="IBM Plex Mono,monospace" font-size="11" fill="#8E2B3A" font-weight="600">There is no server here.</text>
+        <text x="426" y="318" font-family="IBM Plex Mono,monospace" font-size="11" fill="#8E2B3A" font-weight="600">The link itself carries the</text>
+        <text x="426" y="336" font-family="IBM Plex Mono,monospace" font-size="11" fill="#8E2B3A" font-weight="600">ticket. You send it like any link.</text>
 
-        <path d="M342 541 C 390 541, 400 400, 442 345" fill="none" stroke="#171410" stroke-width="2" marker-end="url(#ar)"/>
-        <path d="M638 345 C 690 345, 700 200, 748 172" fill="none" stroke="#171410" stroke-width="2" marker-end="url(#ar)"/>
+        <path d="M342 541 C 390 541, 400 400, 442 200" fill="none" stroke="#171410" stroke-width="2" marker-end="url(#ar)"/>
 
-        <!-- zone 3 -->
         <rect x="712" y="52" width="452" height="586" fill="#F1EBDB" stroke="#171410" stroke-width="2" stroke-dasharray="9 5"/>
-        <text x="722" y="40" font-family="IBM Plex Mono,monospace" font-size="12.5" font-weight="600" letter-spacing="1.6" fill="#171410">FIRM TENANT</text>
+        <text x="722" y="40" font-family="IBM Plex Mono,monospace" font-size="12.5" font-weight="600" letter-spacing="1.6" fill="#171410">RECEIVING DEVICE</text>
 
         <rect x="748" y="120" width="380" height="86" fill="#FBF8EF" stroke="#171410" stroke-width="2"/>
-        <text x="764" y="150" font-family="Archivo,sans-serif" font-size="15" font-weight="700" fill="#171410">Desk browser · WebCrypto unseal</text>
-        <text x="764" y="172" font-family="IBM Plex Mono,monospace" font-size="10.5" fill="#6E6558">passphrase re-entered here once per session</text>
-        <text x="764" y="190" font-family="IBM Plex Mono,monospace" font-size="10.5" fill="#6E6558">extension or plain page, no install required</text>
-
-        <line x1="938" y1="206" x2="938" y2="248" stroke="#171410" stroke-width="2" marker-end="url(#ar)"/>
-
-        <g font-family="IBM Plex Mono,monospace" font-size="11.5" font-weight="600">
-          <rect x="748" y="256" width="182" height="56" fill="#F2A007" stroke="#171410" stroke-width="2"/>
-          <text x="762" y="280" fill="#171410">CLIPBOARD</text>
-          <text x="762" y="298" font-size="9.5" font-weight="400" fill="#171410">default · zero scopes</text>
-
-          <rect x="946" y="256" width="182" height="56" fill="#FBF8EF" stroke="#171410" stroke-width="2"/>
-          <text x="960" y="280" fill="#171410">SERVICENOW</text>
-          <text x="960" y="298" font-size="9.5" font-weight="400" fill="#6E6558">paste, or Table API</text>
-
-          <rect x="748" y="326" width="182" height="56" fill="#FBF8EF" stroke="#171410" stroke-width="2"/>
-          <text x="762" y="350" fill="#171410">GOOGLE DOCS</text>
-          <text x="762" y="368" font-size="9.5" font-weight="400" fill="#6E6558">drive.file scope only</text>
-
-          <rect x="946" y="326" width="182" height="56" fill="#FBF8EF" stroke="#171410" stroke-width="2"/>
-          <text x="960" y="350" fill="#171410">WORD ONLINE</text>
-          <text x="960" y="368" font-size="9.5" font-weight="400" fill="#6E6558">Files.ReadWrite scope</text>
-        </g>
+        <text x="764" y="150" font-family="Archivo,sans-serif" font-size="15" font-weight="700" fill="#171410">Legal-pad receiver page</text>
+        <text x="764" y="172" font-family="IBM Plex Mono,monospace" font-size="10.5" fill="#6E6558">decrypts/decodes the fragment client-side, on load</text>
+        <text x="764" y="190" font-family="IBM Plex Mono,monospace" font-size="10.5" fill="#6E6558">nothing is written to storage — Copy or Clear only</text>
 
         <rect x="748" y="424" width="380" height="150" fill="#FBF8EF" stroke="#8E2B3A" stroke-width="3"/>
         <text x="764" y="452" font-family="IBM Plex Mono,monospace" font-size="10.5" font-weight="600" letter-spacing="1.4" fill="#8E2B3A">SAY THIS OUT LOUD IN THE SECURITY REVIEW</text>
-        <text x="764" y="480" font-family="Archivo,sans-serif" font-size="14" fill="#171410">The promise ends at this box. Once a ticket</text>
-        <text x="764" y="500" font-family="Archivo,sans-serif" font-size="14" fill="#171410">lands in Docs or Word, it is governed by the</text>
-        <text x="764" y="520" font-family="Archivo,sans-serif" font-size="14" fill="#171410">firm&#8217;s own tenant policy. So the app must</text>
-        <text x="764" y="540" font-family="Archivo,sans-serif" font-size="14" fill="#171410">refuse personal accounts and bind to the</text>
-        <text x="764" y="560" font-family="Archivo,sans-serif" font-size="14" fill="#171410">work tenant at first launch.</text>
-
-        <text x="722" y="612" font-family="IBM Plex Mono,monospace" font-size="11" fill="#6E6558">OAuth tokens live on the desk side only. The handset never holds a Google or Microsoft credential.</text>
+        <text x="764" y="480" font-family="Archivo,sans-serif" font-size="14" fill="#171410">Open links can be read by anyone who has the</text>
+        <text x="764" y="500" font-family="Archivo,sans-serif" font-size="14" fill="#171410">URL — that's the whole point of Open, and it is</text>
+        <text x="764" y="520" font-family="Archivo,sans-serif" font-size="14" fill="#171410">disclosed before one is generated. Private links</text>
+        <text x="764" y="540" font-family="Archivo,sans-serif" font-size="14" fill="#171410">need the passphrase, which travels separately.</text>
       </svg>
     </div>
 
@@ -528,7 +509,7 @@
       <div class="cost">
         <div class="k">Inference cost per user</div>
         <div class="v">$0.00</div>
-        <div class="d">Their silicon, their battery. This line never grows with usage.</div>
+        <div class="d">Whisper runs on their silicon, their battery. This line never grows with usage.</div>
       </div>
       <div class="cost">
         <div class="k">Relay and weights, 1,000 users (planned)</div>
@@ -548,9 +529,19 @@
     </div>
   </div>
 
+  <!-- ============ DEBUG PANE (operator's log, ?debug=1 only) ============ -->
+  <div id="debugPane">
+    <div class="notes">
+      <h2>Operator&#8217;s log</h2>
+      <p class="lead">Debug view. Everything below is a live account of what the page is actually doing.</p>
+      <div class="pipe" id="pipe"></div>
+      <div id="log" aria-live="polite"></div>
+    </div>
+  </div>
+
 </div>
 
-<!-- passphrase modal -->
+<!-- passphrase modal (used for sealing / retry contexts) -->
 <div class="modal" id="modal" role="dialog" aria-modal="true" aria-labelledby="mTitle">
   <div class="mbox">
     <h3 id="mTitle">Set a passphrase</h3>
@@ -577,13 +568,54 @@
   </div>
 </div>
 
+<!-- settings sheet -->
+<div class="modal" id="setmodal" role="dialog" aria-modal="true" aria-labelledby="setTitle">
+  <div class="mbox">
+    <h3 id="setTitle">Settings</h3>
+    <div class="settgroup">
+      <span class="eyebrow">Finish</span>
+      <div class="choices" id="finishChoices">
+        <button class="choice" data-finish="light">Light</button>
+        <button class="choice" data-finish="dark">Dark</button>
+        <button class="choice" data-finish="system">System</button>
+      </div>
+    </div>
+    <div class="settgroup">
+      <span class="eyebrow">Waveform color</span>
+      <div class="choices" id="waveChoices">
+        <button class="choice" data-wave="rainbow">Rainbow</button>
+        <button class="choice" data-wave="bw">Black &amp; White</button>
+        <button class="choice" data-wave="amber">Amber</button>
+      </div>
+    </div>
+    <div class="settgroup">
+      <span class="eyebrow">Your name</span>
+      <input type="text" id="setYou" placeholder="used in the resolved-ticket wording" spellcheck="false">
+    </div>
+    <div class="settgroup">
+      <span class="eyebrow">Workspace style</span>
+      <input type="text" id="setWs" placeholder="Your workspace" spellcheck="false">
+    </div>
+    <div class="settgroup">
+      <span class="eyebrow">License</span>
+      <div id="setLicLine" style="font-size:13px;color:var(--ink-soft);margin-bottom:8px"></div>
+      <button class="act sm ghost" id="setLicBtn">Manage license</button>
+    </div>
+    <button class="act sm" id="setClose">Done</button>
+  </div>
+</div>
+
+<!-- share sheet -->
+<div class="modal" id="sharemodal" role="dialog" aria-modal="true" aria-labelledby="shareTitle">
+  <div class="mbox" id="shareBody"></div>
+</div>
+
 <script>
 /* ================================================================
    TAKE · working prototype
    Everything runs in this page. Nothing leaves it except:
-   - Web Speech audio, if you choose the Speech engine (browser vendor recognizer)
-   - the one-time Whisper model download, if you choose Whisper
-   Sealed blobs are the only exportable artifact.
+   - the one-time Whisper model download
+   - a share link, only when you generate and send one yourself
    ================================================================ */
 
 /* __TESTABLE_START__ (pure logic — no DOM; exercised by node tests) */
@@ -820,6 +852,30 @@ function renderTicketText(take,ws){
   return out.trim();
 }
 
+// "fills, never composes": the narrative house style only ever assembles
+// sentences out of substrings the extractor actually pulled from the
+// transcript. If a required fact is missing it returns null rather than
+// inventing filler — callers fall back to the structured field view, where
+// missing fields are already visibly flagged.
+function leadLower(s){
+  if(!s)return s;
+  if(/^I\b/.test(s))return s; // keep the pronoun "I" capitalized
+  return s.charAt(0).toLowerCase()+s.slice(1);
+}
+function renderTicketNarrative(take,ws,you){
+  if(!take||take.template==='Request')return null;
+  var f=fmap(take.fields);
+  if(!f.requester||!f.short||!you)return null;
+  var resSents=(f.resolution||'').split(/\.\s+/).map(function(s){return s.replace(/\.$/,'')}).filter(Boolean);
+  if(!resSents.length)return null;
+  var lines=[];
+  lines.push(f.requester+' reached out noting that '+leadLower(f.short)+'.');
+  lines.push(you+' connected with '+f.requester+' and '+leadLower(resSents[0])+'.');
+  if(resSents.length>1)lines.push(you+' then '+leadLower(resSents[1])+'.');
+  if(f.rcode)lines.push(you+' verified '+leadLower(f.rcode)+'.');
+  return lines.join(' ');
+}
+
 /* ---- crypto: PBKDF2(310k, SHA-256) -> AES-256-GCM, WebCrypto only ---- */
 function b64(buf){
   var u=new Uint8Array(buf),s='';
@@ -830,6 +886,15 @@ function unb64(str){
   var s=atob(str),u=new Uint8Array(s.length);
   for(var i=0;i<s.length;i++)u[i]=s.charCodeAt(i);
   return u;
+}
+// base64url helpers, for embedding JSON payloads in a URL fragment
+function b64u(str){
+  return btoa(unescape(encodeURIComponent(str))).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'');
+}
+function unb64u(str){
+  str=String(str||'').replace(/-/g,'+').replace(/_/g,'/');
+  while(str.length%4)str+='=';
+  return decodeURIComponent(escape(atob(str)));
 }
 function deriveKey(pass,salt){
   return crypto.subtle.importKey('raw',new TextEncoder().encode(pass),'PBKDF2',false,['deriveKey'])
@@ -855,6 +920,16 @@ function unsealTake(blob,pass){
   }).then(function(pt){
     return JSON.parse(new TextDecoder().decode(pt));
   });
+}
+
+/* ---- ephemeral share links: "p1." = sealed (private), "o1." = plain (open) ---- */
+function encodeSharePayload(kind,obj){
+  return kind+'.'+b64u(JSON.stringify(obj));
+}
+function decodeSharePayload(fragment){
+  var m=String(fragment||'').match(/take=([a-z0-9]+)\.(.+)$/i);
+  if(!m)return null;
+  try{return {kind:m[1],obj:JSON.parse(unb64u(m[2]))}}catch(e){return null}
 }
 
 /* ---- license keys: ECDSA P-256 over a JSON payload, verified offline ---- */
@@ -894,15 +969,18 @@ function verifyLicense(key,pubJwk){
 if(typeof document!=='undefined')(function(){
 'use strict';
 
-var TTL_MS=7*24*3600*1000;
-var K={relay:'take.relay.v1',prefs:'take.prefs.v1',lic:'take.lic.v1',trial:'take.trial.v1'};
+var DEBUG=/(?:^|[?&])debug=1(?:&|$)/.test(location.search);
+var K={prefs:'take.prefs.v1',lic:'take.lic.v1',trial:'take.trial.v1'};
 var DEMO_TAPE="Ticket for Marla Bennett, Cincinnati office. She's getting the Duo push but it times out before she can approve it. Started this morning right after her phone swap. Her old handset is still showing active in the Duo admin console, so this looks like a stale enrollment. I removed the orphaned device, re-enrolled her on the new phone, verified push on the first attempt. Priority three, authentication, resolved on first contact, about fifteen minutes.";
 
 var TRIAL_LIMIT=10;
 var BUY_URL='';/* your Gumroad / Lemon Squeezy / Stripe payment link */
 var PUBKEY_JWK={"key_ops":["verify"],"ext":true,"kty":"EC","x":"V9uN1IxgX0sv69zPFO5NeV5oLC7kS_bslHK40OqPU7Q","y":"Dhz-cl_b4rTcWO1w0yZjHQ2iTZgNf7ZzeTMyIGqT3rk","crv":"P-256"};/* rotate before selling: node tools/keygen.mjs init --write */
+var WAVE_STOPS=['#F2545B','#F2A007','#3FA98C','#2E8570','#3B7FC4','#8E5BC2']; // rainbow spectrum, orange-forward per brief
 
-/* storage — localStorage when the browser allows it, memory otherwise */
+/* storage — localStorage when the browser allows it, memory otherwise.
+   Only preferences and license/trial state are ever persisted — never
+   ticket text, audio, share payloads, or passphrases. */
 var MEM={},LSOK=false;
 try{localStorage.setItem('__take_t','1');localStorage.removeItem('__take_t');LSOK=true}catch(e){}
 function store(k,v){
@@ -915,43 +993,32 @@ function store(k,v){
 }
 
 var S={
-  screen:0,rec:false,demo:false,engine:'speech',
-  ws:'Your workspace',template:'Incident',priority:'P3',
-  take:null,sessionPass:null,
-  stream:null,ac:null,an:null,sr:null,srFinal:'',srInterim:'',mr:null,chunks:[],
-  t:null,meter:null,demoI:null,clock:0,
+  screen:0,rec:false,demo:false,
+  ws:'Your workspace',you:'',template:'Incident',priority:'P3',
+  finish:'light',wave:'rainbow',
+  take:null,failedAudio:null,
+  stream:null,ac:null,an:null,mr:null,chunks:[],
+  t:null,meter:null,demoI:null,clock:0,wakeLock:null,
   wh:{pipe:null,ready:false,loading:false,err:null}
 };
 
 var prefs=store(K.prefs)||{};
 if(prefs.ws)S.ws=prefs.ws;
-if(prefs.engine==='whisper'||prefs.engine==='speech')S.engine=prefs.engine;
-S.theme=(prefs.theme==='dark'||prefs.theme==='light')?prefs.theme
-  :((window.matchMedia&&matchMedia('(prefers-color-scheme: dark)').matches)?'dark':'light');
-applyTheme();
+if(prefs.you)S.you=prefs.you;
+if(prefs.wave==='rainbow'||prefs.wave==='bw'||prefs.wave==='amber')S.wave=prefs.wave;
+S.finish=(prefs.finish==='dark'||prefs.finish==='light'||prefs.finish==='system')?prefs.finish:'system';
+applyFinish();
+applyWave();
 
 function el(id){return document.getElementById(id)}
 function esc(s){return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;')}
 function pad(n){return (n<10?'0':'')+n}
 function fmt(s){return pad(Math.floor(s/60))+':'+pad(s%60)}
 function now(){var d=new Date();return pad(d.getHours())+':'+pad(d.getMinutes())+':'+pad(d.getSeconds())}
-function ago(ts){
-  var s=Math.max(0,(Date.now()-ts)/1000);
-  if(s<60)return Math.round(s)+'s ago';
-  if(s<3600)return Math.round(s/60)+'m ago';
-  if(s<86400)return Math.round(s/3600)+'h ago';
-  return Math.round(s/86400)+'d ago';
-}
-function expiry(r){
-  if(r.pin)return 'pinned';
-  var rem=r.at+TTL_MS-Date.now();
-  if(rem<=0)return 'expired';
-  var d=Math.floor(rem/86400000),h=Math.floor(rem%86400000/3600000);
-  return d>0?('burns in '+d+'d '+h+'h'):('burns in '+h+'h');
-}
 
-/* ---- operator's log + pipeline panel ---- */
+/* ---- operator's log + pipeline panel (debug only) ---- */
 function log(msg,cls){
+  if(!DEBUG)return;
   var host=el('log');if(!host)return;
   var d=document.createElement('div');
   d.className='le'+(cls?' '+cls:'');
@@ -961,19 +1028,15 @@ function log(msg,cls){
 }
 function pipeRow(k,v,cls){return '<div class="pr"><span class="pk">'+k+'</span><span class="pv '+(cls||'')+'">'+v+'</span></div>'}
 function updatePipe(){
+  if(!DEBUG)return;
   var host=el('pipe');if(!host)return;
   var h='';
-  h+=S.engine==='speech'
-    ?pipeRow('Engine','Web Speech · browser recognizer','warn')
-    :pipeRow('Engine','Whisper · on this machine','ok');
+  h+=pipeRow('Engine','Whisper · on this machine','ok');
   h+=S.wh.ready?pipeRow('Model','whisper-tiny.en · cached','ok')
     :S.wh.loading?pipeRow('Model','downloading…','warn')
     :S.wh.err?pipeRow('Model','load failed','bad')
     :pipeRow('Model','not loaded','');
   h+=S.rec?pipeRow('Mic','LIVE','bad'):pipeRow('Mic','idle','');
-  var relay=store(K.relay)||[];
-  h+=pipeRow('Sealed store',relay.length+' take'+(relay.length===1?'':'s')+' · '+(LSOK?'localStorage':'memory only'),LSOK?'':'warn');
-  h+=S.sessionPass?pipeRow('Session key','derived · in memory only','ok'):pipeRow('Session key','none','');
   h+=licState()?pipeRow('License','unlocked','ok'):pipeRow('License','trial · '+trialUsed()+'/'+TRIAL_LIMIT+' takes','warn');
   host.innerHTML=h;
 }
@@ -982,10 +1045,10 @@ function lamps(){
   el('lampMdl').className='lamp'+(S.wh.ready?' on':'');
 }
 function toast(msg){
-  var t=el('toast');if(!t)return;
+  var t=document.querySelector('#hardware .toast')||el('toast');if(!t)return;
   t.textContent=msg;t.classList.add('up');
   clearTimeout(toast._h);
-  toast._h=setTimeout(function(){t.classList.remove('up')},2600);
+  toast._h=setTimeout(function(){t.classList.remove('up')},2800);
 }
 
 /* ---- passphrase modal ---- */
@@ -1032,38 +1095,44 @@ function copyText(t){
 
 function statusText(){
   if(S.rec&&S.demo)return 'Demo tape rolling';
-  if(S.rec)return S.engine==='speech'?'Live · speech engine':'Live · buffering for whisper';
-  if(S.engine==='whisper')return S.wh.ready?'Whisper cached · works offline':'Whisper · loads on first use';
-  return 'Speech engine · uses the network';
+  if(S.rec)return 'Live · buffering for whisper';
+  return S.wh.ready?'Whisper cached · works offline':'Whisper · preparing on this device';
 }
 
 function screenCapture(){
-  var segs='';for(var i=0;i<22;i++)segs+='<i class="seg"></i>';
-  var takeN=(store(K.relay)||[]).length+1;
-  return '<div class="device"><div class="cheek"></div><div class="screen">'
-  +'<div class="statusbar"><span class="airplane"><i class="dot" id="sbDot"></i><span id="sbEng">'+esc(statusText())+'</span></span><span id="sbTake">Take '+takeN+'</span></div>'
+  var segs='';for(var i=0;i<22;i++)segs+='<i class="seg" style="--seg-c:'+waveColor(i)+'"></i>';
+  return '<div class="device"><div class="screen">'
+  +'<div class="statusbar"><span class="airplane"><i class="dot" id="sbDot"></i><span id="sbEng">'+esc(statusText())+'</span></span></div>'
   +'<div class="body">'
     +'<div class="grille"><div class="meterhead"><span class="eyebrow">Input</span><span class="clock" id="clock">00:00</span></div>'
       +'<div class="vu" id="vu">'+segs+'</div>'
       +'<div class="scale"><span>-40</span><span>-20</span><span>-10</span><span>-3</span><span>0</span></div></div>'
     +'<div class="live"><span class="eyebrow">Heard so far</span>'
-      +'<div id="tape"><span class="placeholder" id="ph">Press the amber button and describe what happened the way you would tell a colleague. Speech engine shows words live; Whisper transcribes on this machine after you stop. No mic handy? Press DEMO.</span>'
+      +'<div id="tape"><span class="placeholder" id="ph">Press the amber button and describe what happened the way you would tell a colleague. Whisper transcribes on this machine after you stop. No mic handy? Press DEMO.</span>'
       +'<span id="tfin"></span><span id="tint"></span><i class="caret off" id="car"></i></div></div>'
   +'</div>'
   +'<div class="tray">'
     +'<button class="chip'+(S.template==='Incident'?' armed':'')+'" id="chipTpl">'+esc(S.template)+'</button>'
     +'<button class="chip" id="chipPri">'+esc(S.priority)+'</button>'
-    +'<span class="chip"><span class="ws" id="wsChip" contenteditable="true" spellcheck="false" role="textbox" aria-label="Workspace name">'+esc(S.ws)+'</span> style</span>'
-    +'<br>'
-    +'<button class="chip eng" id="engSpeech" aria-pressed="'+(S.engine==='speech')+'">Speech</button>'
-    +'<button class="chip eng" id="engWhisper" aria-pressed="'+(S.engine==='whisper')+'">Whisper</button>'
     +'<button class="chip" id="chipDemo">Demo</button>'
     +'<div class="rec-row"><button class="rec" id="rec">REC</button>'
-    +'<span class="rec-note" id="recnote">Tap to start. Tap again when you are done.<br>Template and engine lock while live.</span></div>'
+    +'<span class="rec-note" id="recnote">Tap to start. Tap again when you are done.</span></div>'
     +'<div class="prog" id="prog"><i id="progFill"></i></div>'
   +'</div>'
   +'<div class="toast" id="toast"></div>'
-  +'</div><div class="cheek b"></div></div>';
+  +'</div></div>';
+}
+
+function waveColor(i){
+  if(S.wave==='bw')return 'var(--ink)';
+  if(S.wave==='amber')return 'var(--pilot)';
+  var n=WAVE_STOPS.length,pos=(i/21)*(n-1),lo=Math.floor(pos),hi=Math.min(n-1,lo+1);
+  return lo===hi?WAVE_STOPS[lo]:mixHex(WAVE_STOPS[lo],WAVE_STOPS[hi],pos-lo);
+}
+function mixHex(a,b,t){
+  function h2r(h){h=h.replace('#','');return [parseInt(h.slice(0,2),16),parseInt(h.slice(2,4),16),parseInt(h.slice(4,6),16)]}
+  var A=h2r(a),B=h2r(b),r=A.map(function(c,i){return Math.round(c+(B[i]-c)*t)});
+  return 'rgb('+r.join(',')+')';
 }
 
 function fieldHTML(f){
@@ -1074,9 +1143,20 @@ function fieldHTML(f){
     +'<div class="val" contenteditable="true" role="textbox" data-key="'+esc(f.key)+'" data-ph="not said out loud" aria-label="'+esc(f.label)+'">'+esc(f.val)+'</div></div>';
 }
 
-function screenReview(){
+function emptyDevice(title,msg){
+  return '<div class="device"><div class="screen">'
+  +'<div class="statusbar"><span class="airplane"><i class="dot"></i><span>Idle</span></span></div>'
+  +'<div class="body"><div class="pad"><div class="screentitle">'+esc(title)+'</div>'
+  +'<p class="placeholder">'+esc(msg)+'</p></div></div>'
+  +'<div class="toast" id="toast"></div></div></div>';
+}
+
+// Ticket screen folds in what used to be a separate Review screen: the
+// extracted fields are editable right above the rendered ticket.
+function screenTicket(){
   if(!S.take||!S.take.fields){
-    return emptyDevice('Review','Nothing to review yet. Record a take on Capture, or press DEMO.');
+    if(S.failedAudio)return screenRetry();
+    return emptyDevice('Ticket','Nothing yet. Record a take on Capture, or press DEMO.');
   }
   var youN=0,checkN=0,fh='';
   S.take.fields.forEach(function(f){
@@ -1086,142 +1166,32 @@ function screenReview(){
   var verdict='<b>Nothing was invented.</b><br>'
     +(youN?youN+' field'+(youN===1?' was':'s were')+' never said out loud — empty until you fill '+(youN===1?'it':'them')+'. ':'Every field came from the transcript. ')
     +(checkN?checkN+' amber field'+(checkN===1?'':'s')+' deserve'+(checkN===1?'s':'')+' a second read.':'');
-  return '<div class="device"><div class="cheek"></div><div class="screen">'
-  +'<div class="statusbar"><span class="airplane"><i class="dot"></i><span>'+esc(S.engine==='speech'?'Speech engine':'Whisper · on-device')+'</span></span><span>Take '+S.take.n+' · Review</span></div>'
+  var narrative=renderTicketNarrative(S.take,S.ws,S.you);
+  var ticketBody=narrative?('<div class="ticket narrative">'+esc(narrative)+'</div>')
+    :(function(){var r=renderTicketParts(S.take,S.ws),body='';r.parts.forEach(function(p){body+='<h4>'+esc(p[0])+'</h4>'+esc(p[1])});return '<div class="ticket">'+body+'</div>'})();
+  return '<div class="device"><div class="screen">'
+  +'<div class="statusbar"><span class="airplane"><i class="dot"></i><span>Take '+S.take.n+'</span></span></div>'
   +'<div class="body"><div class="pad">'
     +'<div class="screentitle">Check the facts</div>'
     +fh
     +'<div class="verdict">'+verdict+'</div>'
-    +'<button class="act" id="renderBtn">Render the ticket</button>'
+    +'<div class="screentitle" style="margin-top:16px">Ready to paste</div>'
+    +'<span class="eyebrow" style="display:block;margin-bottom:9px">'+(narrative?'Narrative house style':'Structured fields — narrative style needs a name, requester, and resolution')+'</span>'
+    +ticketBody
+    +'<div class="actrow"><button class="act" id="copyTicket">Copy ticket</button><button class="act ghost" id="shareTicket">Share</button></div>'
   +'</div></div>'
-  +'<div class="toast" id="toast"></div></div><div class="cheek b"></div></div>';
+  +'<div class="toast" id="toast"></div></div></div>';
 }
 
-function screenTicket(){
-  if(!S.take||!S.take.fields){
-    return emptyDevice('Ticket','No ticket yet. Record a take, check the facts on Review, then render.');
-  }
-  var r=renderTicketParts(S.take,S.ws),body='';
-  r.parts.forEach(function(p){body+='<h4>'+esc(p[0])+'</h4>'+esc(p[1])});
-  return '<div class="device"><div class="cheek"></div><div class="screen">'
-  +'<div class="statusbar"><span class="airplane"><i class="dot"></i><span>Sealed on demand</span></span><span>Take '+S.take.n+' · Ready</span></div>'
+function screenRetry(){
+  return '<div class="device"><div class="screen">'
+  +'<div class="statusbar"><span class="airplane"><i class="dot"></i><span>Transcription failed</span></span></div>'
   +'<div class="body"><div class="pad">'
-    +'<div class="screentitle">Ready to paste</div>'
-    +'<span class="eyebrow" style="display:block;margin-bottom:9px">Rendered in '+esc(S.ws)+' style · deterministic template</span>'
-    +'<div class="ticket">'+body+'</div>'
-    +'<div style="margin-top:10px"><button class="act" id="copyTicket">Copy the ticket</button></div>'
-    +'<div class="targets">'
-      +'<button class="target" data-to="Google Docs">Google Docs<span>not wired in prototype</span></button>'
-      +'<button class="target" data-to="Word Online">Word Online<span>not wired in prototype</span></button>'
-      +'<button class="target" data-to="ServiceNow">ServiceNow<span>not wired in prototype</span></button>'
-      +'<button class="target" data-to="desk" id="toDesk">Send to desk<span>seal with AES-GCM</span></button>'
-    +'</div>'
+    +'<div class="screentitle">Nothing was lost</div>'
+    +'<p class="placeholder">The audio is still in memory. Retry transcription, or discard and record again.</p>'
+    +'<div class="actrow"><button class="act" id="retryBtn">Retry transcription</button><button class="act ghost" id="discardBtn">Discard</button></div>'
   +'</div></div>'
-  +'<div class="toast" id="toast"></div></div><div class="cheek b"></div></div>';
-}
-
-function emptyDevice(title,msg){
-  return '<div class="device"><div class="cheek"></div><div class="screen">'
-  +'<div class="statusbar"><span class="airplane"><i class="dot"></i><span>Idle</span></span><span>'+esc(title)+'</span></div>'
-  +'<div class="body"><div class="pad"><div class="screentitle">'+esc(title)+'</div>'
-  +'<p class="placeholder">'+esc(msg)+'</p></div></div>'
-  +'<div class="toast" id="toast"></div></div><div class="cheek b"></div></div>';
-}
-
-function screenDesk(){
-  var relay=store(K.relay)||[];
-  var inner;
-  if(!S.sessionPass){
-    inner='<div class="eyebrow" style="display:block;margin-bottom:10px">Sealed store · '+relay.length+' take'+(relay.length===1?'':'s')+'</div>'
-    +'<div class="card"><div class="ch"><span>Unseal this session</span></div><div class="cb">'
-    +'<input type="password" class="passfield" id="deskPass" placeholder="passphrase · never sent anywhere" autocomplete="off">'
-    +'<button class="act sm" id="deskUnlock">Unseal</button>'
-    +'<div class="verdict" style="margin:10px 0 0">The passphrase is typed here and kept in page memory only. Takes sealed with a different passphrase stay locked — visibly, not silently.</div>'
-    +'</div></div>';
-  }else{
-    inner='<div class="eyebrow" style="display:block;margin-bottom:10px" id="deskCount">Unsealing…</div>'
-    +'<div id="deskCards"></div>'
-    +'<div class="imp"><div class="eyebrow" style="display:block;margin:14px 0 7px">Relay hop · paste a sealed blob from another machine</div>'
-    +'<textarea id="impBlob" spellcheck="false" placeholder=\'{"v":1,"s":"…","i":"…","c":"…"}\'></textarea>'
-    +'<button class="act sm ghost" id="impBtn">Add sealed take</button></div>'
-    +'<button class="act sm ghost" id="deskClose" style="margin-top:12px">Close session · forget passphrase</button>';
-  }
-  return '<div class="desk"><div class="deskbar"><span>&#9679;&#9679;&#9679;</span><span class="u">take.desk / '+esc(S.ws.toLowerCase())+'</span></div>'
-  +'<div class="deskbody">'+inner+'<div class="toast" id="toast"></div></div></div>';
-}
-
-function deskCard(p,r){
-  var f=fmap(p.fields);
-  return '<div class="card"><div class="ch"><span>Take '+p.n+' · '+ago(r.at)+'</span>'
-    +'<span style="display:flex;gap:5px;align-items:center"><span>'+esc(f.priority||p.priority||'')+'</span>'
-    +'<span class="tag pin'+(r.pin?' on':'')+'" data-pin="'+r.id+'">'+(r.pin?'Pinned':'Pin')+'</span></span></div>'
-    +'<div class="cb"><b>'+esc(f.short||'[untitled take]')+'</b>'
-    +(f.resolution?'<div style="font-size:12px;color:var(--ink-soft);margin-top:5px">'+esc(f.resolution)+'</div>':'')
-    +'<div style="font-family:\'IBM Plex Mono\',monospace;font-size:8.5px;color:var(--ink-soft);margin-top:6px;text-transform:uppercase;letter-spacing:.08em">'+expiry(r)+' · '+esc(p.ws||'')+'</div>'
-    +'<div class="cbtns"><button class="act" data-copy="'+r.id+'">Copy ticket</button>'
-    +'<button class="act ghost" data-blob="'+r.id+'">Copy sealed blob</button></div>'
-    +'</div></div>';
-}
-function lockedCard(r){
-  return '<div class="card locked"><div class="ch"><span>Sealed take · '+ago(r.at)+'</span><span>Locked</span></div>'
-    +'<div class="cb">Sealed with a different passphrase. Nothing on this page can open it — shown locked rather than hidden.'
-    +'<div class="cbtns"><button class="act ghost" data-blob="'+r.id+'">Copy sealed blob</button></div></div></div>';
-}
-
-function fillDesk(){
-  var host=el('deskCards');if(!host)return;
-  var relay=store(K.relay)||[];
-  if(!relay.length){
-    el('deskCount').textContent='Sealed store · empty';
-    host.innerHTML='<div class="card"><div class="ch"><span>Nothing here yet</span></div><div class="cb placeholder">Seal a take from the Ticket screen and it lands here as ciphertext.</div></div>';
-    return;
-  }
-  var opened=0,html='',chain=Promise.resolve();
-  relay.forEach(function(r){
-    chain=chain.then(function(){
-      return unsealTake(r.blob,S.sessionPass).then(function(p){
-        opened++;r._open=p;html+=deskCard(p,r);
-      },function(){
-        r._open=null;html+=lockedCard(r);
-      });
-    });
-  });
-  chain.then(function(){
-    el('deskCount').textContent='Unsealed on this machine · '+opened+' of '+relay.length+' take'+(relay.length===1?'':'s');
-    host.innerHTML=html;
-    log('desk unsealed '+opened+'/'+relay.length+' take'+(relay.length===1?'':'s')+' with the session passphrase',opened?'good':'warn');
-    host.querySelectorAll('[data-copy]').forEach(function(b){
-      b.addEventListener('click',function(){
-        var r=relayById(b.getAttribute('data-copy'));
-        if(r&&r._open)copyText(r._open.ticket||renderTicketText(r._open,r._open.ws)).then(function(ok){
-          toast(ok?'Copied. Paste into ServiceNow.':'Clipboard blocked by the browser.');
-        });
-      });
-    });
-    host.querySelectorAll('[data-blob]').forEach(function(b){
-      b.addEventListener('click',function(){
-        var r=relayById(b.getAttribute('data-blob'));
-        if(r)copyText(JSON.stringify(r.blob)).then(function(ok){
-          toast(ok?'Sealed blob copied · '+(JSON.stringify(r.blob).length/1024).toFixed(1)+' KB of ciphertext':'Clipboard blocked.');
-          log('sealed blob exported — this is the only thing that ever leaves the page','good');
-        });
-      });
-    });
-    host.querySelectorAll('[data-pin]').forEach(function(b){
-      b.addEventListener('click',function(){
-        var r=relayById(b.getAttribute('data-pin'));
-        if(r){r.pin=!r.pin;delete r._open;saveRelay(relay);go(3)}
-      });
-    });
-  });
-}
-function relayById(id){
-  var relay=store(K.relay)||[];
-  for(var i=0;i<relay.length;i++)if(relay[i].id===id)return relay[i];
-  return null;
-}
-function saveRelay(relay){
-  store(K.relay,relay.map(function(r){return {id:r.id,at:r.at,pin:!!r.pin,blob:r.blob}}));
+  +'<div class="toast" id="toast"></div></div></div>';
 }
 
 /* ================= capture machinery ================= */
@@ -1229,6 +1199,7 @@ function saveRelay(relay){
 function releaseStream(){
   if(S.stream){S.stream.getTracks().forEach(function(t){t.stop()});S.stream=null}
   if(S.ac){try{S.ac.close()}catch(e){}S.ac=null;S.an=null}
+  if(S.wakeLock){try{S.wakeLock.release()}catch(e){}S.wakeLock=null}
 }
 function paintVU(lvl){
   var segs=document.querySelectorAll('#vu .seg');
@@ -1244,6 +1215,7 @@ function zeroVU(){
 }
 function startVU(){
   S.ac=new (window.AudioContext||window.webkitAudioContext)();
+  if(S.ac.state==='suspended')S.ac.resume().catch(function(){});
   var src=S.ac.createMediaStreamSource(S.stream);
   S.an=S.ac.createAnalyser();S.an.fftSize=512;
   src.connect(S.an);
@@ -1266,6 +1238,11 @@ function stopTimers(){
   clearInterval(S.t);clearInterval(S.meter);clearInterval(S.demoI);
   S.t=S.meter=S.demoI=null;
 }
+function requestWakeLock(){
+  if(navigator.wakeLock&&navigator.wakeLock.request){
+    navigator.wakeLock.request('screen').then(function(wl){S.wakeLock=wl}).catch(function(){});
+  }
+}
 
 function setLiveUI(on){
   var btn=el('rec');
@@ -1273,7 +1250,7 @@ function setLiveUI(on){
   var car=el('car');if(car)car.classList.toggle('off',!on);
   var dot=el('sbDot');if(dot)dot.classList.toggle('live',on);
   var eng=el('sbEng');if(eng)eng.textContent=statusText();
-  ['chipTpl','chipPri','engSpeech','engWhisper','chipDemo'].forEach(function(id){
+  ['chipTpl','chipPri','chipDemo'].forEach(function(id){
     var b=el(id);if(b)b.disabled=on;
   });
   lamps();updatePipe();
@@ -1282,67 +1259,49 @@ function setLiveUI(on){
 function startRec(){
   if(S.rec)return;
   if(!gateOK()){openLicense();toast('Trial spent — '+TRIAL_LIMIT+' takes recorded. A key unlocks it for good.');return}
-  S.take={n:(store(K.relay)||[]).length+1,at:Date.now(),transcript:'',fields:null,desc:'',
+  S.take={n:S._takeN=(S._takeN||0)+1,at:Date.now(),transcript:'',fields:null,desc:'',
           template:S.template,priority:S.priority};
+  S.failedAudio=null;
   navigator.mediaDevices.getUserMedia({audio:true}).then(function(stream){
     S.stream=stream;S.rec=true;S.demo=false;
     var ph=el('ph');if(ph)ph.remove();
-    el('recnote').innerHTML=S.engine==='speech'
-      ?'Listening. Words appear as the recognizer hears them.<br>Tap again when you are done.'
-      :'Listening. Audio stays in memory — whisper reads it<br>on this machine when you stop.';
-    setLiveUI(true);startVU();startClock();
-    log('mic open · '+(S.engine==='speech'?'streaming to the browser recognizer':'buffering locally for whisper'),S.engine==='speech'?'warn':'good');
-    if(S.engine==='speech')startSR();else startRecorder();
+    el('recnote').innerHTML='Listening. Audio stays in memory — whisper reads it<br>on this machine when you stop.';
+    setLiveUI(true);startVU();startClock();requestWakeLock();
+    log('mic open · buffering locally for whisper','good');
+    startRecorder();
   },function(err){
+    var msg='Microphone unavailable.';
+    if(err.name==='NotAllowedError'||err.name==='PermissionDeniedError')msg='Microphone permission was denied — allow it in the browser/site settings, then try again.';
+    else if(err.name==='NotFoundError'||err.name==='DevicesNotFoundError')msg='No microphone found on this device.';
+    else if(err.name==='NotReadableError')msg='Another app has the microphone locked. Close it and try again.';
     log('microphone unavailable — '+err.name,'bad');
-    toast('Microphone blocked ('+err.name+'). Press DEMO to run the sample take.');
-    updatePipe();
+    toast(msg+' Press DEMO to try the sample take.');
+    setLiveUI(false);
   });
 }
 
-function startSR(){
-  var SRC=window.SpeechRecognition||window.webkitSpeechRecognition;
-  if(!SRC){
-    log('this browser has no Web Speech API — switching to Whisper','warn');
-    toast('No Web Speech here. Switching to the Whisper engine.');
-    engineSet('whisper');startRecorder();return;
-  }
-  S.srFinal='';S.srInterim='';
-  var sr=S.sr=new SRC();
-  sr.continuous=true;sr.interimResults=true;sr.lang='en-US';
-  sr.onresult=function(e){
-    var fin='',inter='';
-    for(var i=0;i<e.results.length;i++){
-      var r=e.results[i];
-      if(r.isFinal)fin+=r[0].transcript;else inter+=r[0].transcript;
-    }
-    S.srFinal=fin;S.srInterim=inter;
-    var tf=el('tfin'),ti=el('tint');
-    if(tf)tf.textContent=fin;
-    if(ti)ti.textContent=inter;
-    var scroller=tf&&tf.closest('.body');
-    if(scroller)scroller.scrollTop=scroller.scrollHeight;
-  };
-  sr.onerror=function(e){
-    if(e.error==='no-speech')return;
-    log('speech engine error — '+e.error,'bad');
-    if(e.error==='not-allowed'||e.error==='service-not-allowed'){
-      toast('Recognizer refused ('+e.error+'). Try the Whisper engine or DEMO.');
-    }
-  };
-  sr.onend=function(){if(S.rec){try{sr.start()}catch(e){}}};
-  try{sr.start()}catch(e){log('speech engine failed to start — '+e.message,'bad')}
+function pickMime(){
+  if(!(window.MediaRecorder&&MediaRecorder.isTypeSupported))return undefined;
+  var candidates=['audio/webm;codecs=opus','audio/webm','audio/ogg;codecs=opus','audio/ogg','audio/mp4'];
+  for(var i=0;i<candidates.length;i++)if(MediaRecorder.isTypeSupported(candidates[i]))return candidates[i];
+  return undefined;
 }
 
 function startRecorder(){
   S.chunks=[];
-  var opts;
-  if(window.MediaRecorder&&MediaRecorder.isTypeSupported&&MediaRecorder.isTypeSupported('audio/webm'))opts={mimeType:'audio/webm'};
-  S.mr=new MediaRecorder(S.stream,opts);
+  var mime=pickMime();
+  try{
+    S.mr=new MediaRecorder(S.stream,mime?{mimeType:mime}:undefined);
+  }catch(e){
+    log('recorder unsupported — '+(e&&e.message||e),'bad');
+    toast('Recording is not supported in this browser. Try DEMO.');
+    S.rec=false;stopTimers();zeroVU();releaseStream();setLiveUI(false);
+    return;
+  }
   S.mr.ondataavailable=function(e){if(e.data&&e.data.size)S.chunks.push(e.data)};
   S.mr.start(250);
   var ti=el('tint');if(ti)ti.textContent='recording — the transcript appears when you stop…';
-  if(!S.wh.ready&&!S.wh.loading)loadWhisper();
+  if(!S.wh.ready&&!S.wh.loading)loadWhisper().catch(function(){});
 }
 
 function toPCM16k(blob){
@@ -1390,13 +1349,12 @@ function loadWhisper(){
     .then(function(pipe){
       S.wh.pipe=pipe;S.wh.ready=true;S.wh.loading=false;S.wh.err=null;
       prog(-1);lamps();updatePipe();
+      var eng=el('sbEng');if(eng)eng.textContent=statusText();
       log('whisper ready — transcription now runs entirely on this machine','good');
     },function(e){
       S.wh.loading=false;S.wh.err=String(e&&e.message||e);
       prog(-1);updatePipe();
       log('whisper load failed — '+S.wh.err,'bad');
-      toast('Could not load Whisper (offline or blocked CDN). Speech engine still works.');
-      if(S.engine==='whisper'&&!S.rec)engineSet('speech');
       throw e;
     });
   return S.wh.loading;
@@ -1408,49 +1366,52 @@ function stopRec(){
   S.rec=false;
   stopTimers();zeroVU();
   var rn=el('recnote');
-  if(S.engine==='speech'){
-    if(S.sr){S.sr.onend=null;try{S.sr.stop()}catch(e){}S.sr=null}
-    S.take.transcript=(S.srFinal+' '+S.srInterim).replace(/\s+/g,' ').trim();
-    releaseStream();setLiveUI(false);
-    if(rn)rn.innerHTML='Pulling the fields out.<br>Deterministic rules, on this page.';
-    finishTake();
-  }else{
-    if(rn)rn.innerHTML='Transcribing on this machine.<br>First run also downloads the model.';
-    setLiveUI(false);
-    var mr=S.mr;
-    new Promise(function(res){mr.onstop=res;try{mr.stop()}catch(e){res()}})
-    .then(function(){
-      releaseStream();
-      var blob=new Blob(S.chunks,{type:mr.mimeType||'audio/webm'});
-      var ti=el('tint');if(ti)ti.textContent='transcribing on this machine…';
-      log('recording closed · '+(blob.size/1024).toFixed(0)+' KB of audio in memory, never written to disk');
-      return toPCM16k(blob).then(function(pcm){
-        return loadWhisper().then(function(){
-          var t0=performance.now();
-          return S.wh.pipe(pcm,{chunk_length_s:30,stride_length_s:5}).then(function(out){
-            var txt=(out&&out.text||'').trim();
-            log('whisper transcribed '+(pcm.length/16000).toFixed(1)+'s of audio in '+((performance.now()-t0)/1000).toFixed(1)+'s · on-device','good');
-            S.take.transcript=txt;
-            var tf=el('tfin');if(tf)tf.textContent=txt;
-            if(ti)ti.textContent='';
-            finishTake();
-          });
-        });
-      });
-    })
-    .catch(function(e){
-      var ti=el('tint');if(ti)ti.textContent='';
-      log('whisper path failed — '+(e&&e.message||e),'bad');
-      toast('Transcription failed. Try the Speech engine, or DEMO.');
-    });
-  }
+  if(rn)rn.innerHTML='Transcribing on this machine.<br>First run also downloads the model.';
+  setLiveUI(false);
+  var mr=S.mr;
+  new Promise(function(res){mr.onstop=res;try{mr.stop()}catch(e){res()}})
+  .then(function(){
+    releaseStream();
+    var blob=new Blob(S.chunks,{type:mr.mimeType||'audio/webm'});
+    var ti=el('tint');if(ti)ti.textContent='transcribing on this machine…';
+    log('recording closed · '+(blob.size/1024).toFixed(0)+' KB of audio in memory, never written to disk');
+    transcribeBlob(blob);
+  });
 }
+
+// Kept separate from stopRec so a failed transcription can be retried
+// against the same in-memory audio without re-recording.
+function transcribeBlob(blob){
+  return toPCM16k(blob).then(function(pcm){
+    if(!pcm.length||maxAbs(pcm)<0.005){
+      log('silent take — nothing audible was captured','warn');
+      toast('Didn’t hear anything. Check the mic and try again.');
+      go(0);return;
+    }
+    return loadWhisper().then(function(){
+      var t0=performance.now();
+      return S.wh.pipe(pcm,{chunk_length_s:30,stride_length_s:5}).then(function(out){
+        var txt=(out&&out.text||'').trim();
+        log('whisper transcribed '+(pcm.length/16000).toFixed(1)+'s of audio in '+((performance.now()-t0)/1000).toFixed(1)+'s · on-device','good');
+        S.take.transcript=txt;
+        S.failedAudio=null;
+        finishTake();
+      });
+    });
+  }).catch(function(e){
+    log('whisper path failed — '+(e&&e.message||e),'bad');
+    S.failedAudio=blob; // preserved so Retry can reuse it — no re-recording needed
+    toast('Transcription failed, but nothing was lost.');
+    go(2);
+  });
+}
+function maxAbs(pcm){var m=0;for(var i=0;i<pcm.length;i++){var a=Math.abs(pcm[i]);if(a>m)m=a}return m}
 
 function finishTake(){
   if(!S.take.transcript){
     toast('Nothing heard. The take was discarded, not saved.');
     log('empty take discarded','warn');
-    updatePipe();return;
+    updatePipe();go(0);return;
   }
   var r=extractFields(S.take.transcript,S.take.template,S.take.priority);
   S.take.fields=r.fields;S.take.desc=r.desc;
@@ -1461,14 +1422,15 @@ function finishTake(){
     log('trial take '+trialUsed()+' of '+TRIAL_LIMIT,'warn');
   }
   toast('Fields extracted on this page · no network involved');
-  setTimeout(function(){go(1)},800);
+  setTimeout(function(){go(2)},600);
 }
 
 /* ---- demo tape ---- */
 function runDemo(){
   if(S.rec)return;
-  S.take={n:(store(K.relay)||[]).length+1,at:Date.now(),transcript:'',fields:null,desc:'',
+  S.take={n:S._takeN=(S._takeN||0)+1,at:Date.now(),transcript:'',fields:null,desc:'',
           template:S.template,priority:S.priority,demo:true};
+  S.failedAudio=null;
   S.rec=true;S.demo=true;
   var ph=el('ph');if(ph)ph.remove();
   el('recnote').innerHTML='Demo tape rolling — no microphone involved.<br>Tap STOP to cut it early.';
@@ -1492,34 +1454,120 @@ function stopDemo(){
   finishTake();
 }
 
-/* ================= sealing ================= */
+/* ================= share sheet ================= */
 
-function sendToDesk(){
-  var prep=S.sessionPass
-    ?Promise.resolve(S.sessionPass)
-    :askPass('Set a passphrase','Sealing happens on this page with AES-256-GCM, key derived by PBKDF2. The passphrase is never stored or sent; the Desk needs the same one to unseal.');
-  prep.then(function(pass){
-    if(!pass){toast('Sealing cancelled.');return}
-    S.sessionPass=pass;
-    var payload={
-      n:S.take.n,at:Date.now(),ws:S.ws,
-      template:S.take.template,priority:S.take.priority,
-      fields:S.take.fields,desc:S.take.desc,
-      ticket:renderTicketText(S.take,S.ws)
-    };
-    sealTake(payload,pass).then(function(blob){
-      var relay=store(K.relay)||[];
-      relay.push({id:'t'+Date.now().toString(36)+Math.random().toString(36).slice(2,6),at:payload.at,pin:false,blob:blob});
-      saveRelay(relay);
-      var kb=(JSON.stringify(blob).length/1024).toFixed(1);
-      toast('Sealed · '+kb+' KB of ciphertext in the store');
-      log('take '+payload.n+' sealed → store holds '+kb+' KB it cannot read · key stays in page memory','good');
-      updatePipe();
-    },function(e){
-      toast('Seal failed: '+(e&&e.message||e));
-      log('seal failed — '+(e&&e.message||e),'bad');
-    });
+function shareURLBase(){return location.origin+location.pathname}
+
+function openShareSheet(){
+  if(!S.take||!S.take.fields)return;
+  var m=el('sharemodal'),body=el('shareBody');
+  body.innerHTML='<h3>Share this ticket</h3>'
+    +'<p>This makes a link, not a saved copy. Nothing is stored anywhere — the ticket travels inside the link itself, the same way a YouTube link carries a video ID.</p>'
+    +'<div class="mrow"><button class="act sm" id="shPrivate">Private<br><span style="font-weight:400;font-size:9.5px">passphrase-protected</span></button>'
+    +'<button class="act sm ghost" id="shOpen">Open<br><span style="font-weight:400;font-size:9.5px">anyone with the link</span></button></div>'
+    +'<div class="mrow" style="margin-top:8px"><button class="act sm ghost" id="shCancel">Cancel</button></div>';
+  m.classList.add('up');
+  el('shPrivate').addEventListener('click',function(){shareFlow('private')});
+  el('shOpen').addEventListener('click',function(){shareFlow('open')});
+  el('shCancel').addEventListener('click',function(){m.classList.remove('up')});
+}
+
+function buildSharePayload(){
+  return {n:S.take.n,at:Date.now(),ws:S.ws,you:S.you,
+    template:S.take.template,priority:S.take.priority,
+    fields:S.take.fields,desc:S.take.desc,
+    ticket:renderTicketNarrative(S.take,S.ws,S.you)||renderTicketText(S.take,S.ws)};
+}
+
+function finishShare(url){
+  var body=el('shareBody');
+  var big=url.length>6000;
+  body.innerHTML='<h3>Link ready</h3>'
+    +(big?'<div class="warnbox">This link is long ('+url.length+' characters) and may not paste cleanly everywhere. Copy ticket instead if that happens.</div>':'')
+    +'<div class="linkbox">'+esc(url)+'</div>'
+    +'<div class="mrow"><button class="act sm" id="shSend">Send…</button><button class="act sm ghost" id="shCopy">Copy link</button></div>'
+    +'<div class="mrow" style="margin-top:8px"><button class="act sm ghost" id="shDone">Done</button></div>';
+  el('shDone').addEventListener('click',function(){el('sharemodal').classList.remove('up')});
+  el('shCopy').addEventListener('click',function(){copyText(url).then(function(ok){toast(ok?'Link copied.':'Clipboard blocked.')})});
+  el('shSend').addEventListener('click',function(){
+    if(navigator.share)navigator.share({title:'TAKE ticket',url:url}).catch(function(){});
+    else copyText(url).then(function(ok){toast(ok?'Link copied — paste it wherever you like.':'Clipboard blocked.')});
   });
+}
+
+function shareFlow(kind){
+  var body=el('shareBody');
+  if(kind==='open'){
+    body.innerHTML='<h3>Open link</h3>'
+      +'<div class="warnbox">Anyone with this link can read the ticket. There is no passphrase.</div>'
+      +'<div class="mrow"><button class="act sm" id="shOpenConfirm">Generate anyway</button><button class="act sm ghost" id="shOpenCancel">Back</button></div>';
+    el('shOpenCancel').addEventListener('click',openShareSheet);
+    el('shOpenConfirm').addEventListener('click',function(){
+      var url=shareURLBase()+'#take='+encodeSharePayload('o1',buildSharePayload());
+      log('open share link generated — plainly readable by anyone who has it','warn');
+      finishShare(url);
+    });
+    return;
+  }
+  body.innerHTML='<h3>Private link</h3>'
+    +'<p>Encrypted with AES-256-GCM, key derived from a passphrase you choose. The passphrase never goes in the link — send it a different way (say it on a call, a separate text).</p>'
+    +'<input type="password" id="shPass" placeholder="at least 6 characters" autocomplete="off">'
+    +'<div class="mrow"><button class="act sm" id="shPassGo" disabled>Seal &amp; generate link</button><button class="act sm ghost" id="shPassCancel">Back</button></div>';
+  var pi=el('shPass'),go2=el('shPassGo');
+  pi.addEventListener('input',function(){go2.disabled=pi.value.length<6});
+  el('shPassCancel').addEventListener('click',openShareSheet);
+  go2.addEventListener('click',function(){
+    var pass=pi.value;
+    sealTake(buildSharePayload(),pass).then(function(blob){
+      var url=shareURLBase()+'#take='+encodeSharePayload('p1',blob);
+      log('private share link generated — sealed, passphrase never included','good');
+      finishShare(url);
+    },function(e){toast('Could not seal: '+(e&&e.message||e))});
+  });
+}
+
+/* ================= legal-pad receiver ================= */
+
+function tryReceiver(){
+  var parsed=decodeSharePayload(location.hash);
+  if(!parsed)return false;
+  document.body.classList.add('receiving');
+  el('mainapp').style.display='none';
+  var r=el('receiver');r.classList.add('on');
+  if(parsed.kind==='o1')renderReceiverTicket(parsed.obj);
+  else renderReceiverLocked();
+  return true;
+
+  function renderReceiverLocked(){
+    el('receiverBody').innerHTML='<div class="padsheet"><input type="password" class="padpass" id="recvPass" placeholder="passphrase" autocomplete="off">'
+      +'<div class="padbtn" id="recvGo" role="button" tabindex="0">Open</div>'
+      +'<div class="padtext" id="recvMsg" style="margin-top:14px;font-size:12px"></div></div>';
+    function tryOpen(){
+      var pass=el('recvPass').value;
+      unsealTake(parsed.obj,pass).then(function(obj){renderReceiverTicket(obj)},function(){
+        el('recvMsg').textContent='Wrong passphrase, or the link is damaged.';
+      });
+    }
+    el('recvGo').addEventListener('click',tryOpen);
+    el('recvPass').addEventListener('keydown',function(e){if(e.key==='Enter')tryOpen()});
+  }
+  function renderReceiverTicket(obj){
+    var text=obj&&obj.ticket||'';
+    el('receiverBody').innerHTML='<div class="padsheet"><div class="padtext" id="padText" contenteditable="true">'+esc(text)+'</div></div>'
+      +'<div class="padactions"><button class="padbtn" id="padCopy">Copy</button><button class="padbtn" id="padClear">Clear</button></div>';
+    el('padCopy').addEventListener('click',function(){
+      copyText(el('padText').textContent).then(function(ok){toast(ok?'Copied.':'Clipboard blocked.')});
+    });
+    el('padClear').addEventListener('click',clearReceiver);
+  }
+  function clearReceiver(){
+    el('receiverBody').innerHTML='';
+    history.replaceState(null,'',location.pathname+location.search);
+    el('receiver').classList.remove('on');
+    document.body.classList.remove('receiving');
+    el('mainapp').style.display='';
+    go(0);
+  }
 }
 
 /* ================= wiring ================= */
@@ -1533,12 +1581,6 @@ function collectReviewEdits(){
 }
 
 function bind(){
-  var ws=el('wsChip');
-  if(ws){
-    ws.addEventListener('input',function(){S.ws=ws.textContent.trim()||'Your workspace';savePrefs()});
-    ws.addEventListener('keydown',function(e){if(e.key==='Enter'){e.preventDefault();ws.blur()}});
-    ws.addEventListener('blur',function(){if(!ws.textContent.trim()){ws.textContent=S.ws='Your workspace'}});
-  }
   var rc=el('rec');
   if(rc)rc.addEventListener('click',function(){S.rec?stopRec():startRec()});
   var tpl=el('chipTpl');
@@ -1554,104 +1596,69 @@ function bind(){
     S.priority=order[(order.indexOf(S.priority)+1)%4];
     pri.textContent=S.priority;
   });
-  var es=el('engSpeech'),ew=el('engWhisper');
-  if(es)es.addEventListener('click',function(){engineSet('speech')});
-  if(ew)ew.addEventListener('click',function(){engineSet('whisper')});
   var dm=el('chipDemo');
   if(dm)dm.addEventListener('click',runDemo);
 
-  var rb=el('renderBtn');
-  if(rb)rb.addEventListener('click',function(){
-    collectReviewEdits();
-    var f=fmap(S.take.fields);
-    if(!f.short){
-      toast('Short description is empty — the app would rather nag than guess.');
-      var v=document.querySelector('.val[data-key="short"]');if(v)v.focus();
-      return;
-    }
-    log('facts confirmed · rendering in '+S.ws+' style — template, not generation');
-    go(2);
-  });
   document.querySelectorAll('.val[data-key]').forEach(function(v){
     v.addEventListener('input',function(){
       var head=v.parentElement.querySelector('.tag.you');
       if(head&&v.textContent.trim())head.remove();
+      collectReviewEdits();
     });
   });
 
   var cp=el('copyTicket');
   if(cp)cp.addEventListener('click',function(){
-    copyText(renderTicketText(S.take,S.ws)).then(function(ok){
-      toast(ok?'Copied. Paste into ServiceNow.':'Clipboard blocked by the browser.');
+    var text=renderTicketNarrative(S.take,S.ws,S.you)||renderTicketText(S.take,S.ws);
+    copyText(text).then(function(ok){
+      toast(ok?'Copied. Paste into your ticketing system.':'Clipboard blocked by the browser.');
       if(ok)log('ticket copied to clipboard — zero scopes needed','good');
     });
   });
-  document.querySelectorAll('.target').forEach(function(b){
-    b.addEventListener('click',function(){
-      var to=b.getAttribute('data-to');
-      if(to==='desk'){sendToDesk();return}
-      copyText(renderTicketText(S.take,S.ws)).then(function(ok){
-        toast(to+' is not wired in the prototype — '+(ok?'copied to clipboard instead.':'and the clipboard is blocked.'));
-        log(to+' target pressed · integration stubbed — clipboard is the honest default','warn');
-      });
-    });
-  });
+  var sh=el('shareTicket');
+  if(sh)sh.addEventListener('click',openShareSheet);
 
-  var du=el('deskUnlock'),dp=el('deskPass');
-  function tryUnlock(){
-    if(!dp||dp.value.length<1)return;
-    S.sessionPass=dp.value;
-    log('desk session opened · passphrase held in memory, never transmitted');
-    go(3);
-  }
-  if(du)du.addEventListener('click',tryUnlock);
-  if(dp)dp.addEventListener('keydown',function(e){if(e.key==='Enter')tryUnlock()});
-  var dc=el('deskClose');
-  if(dc)dc.addEventListener('click',function(){
-    S.sessionPass=null;
-    log('desk session closed — takes are opaque again','warn');
-    go(3);
+  var rt=el('retryBtn');
+  if(rt)rt.addEventListener('click',function(){
+    var blob=S.failedAudio;if(!blob)return;
+    toast('Retrying transcription…');
+    transcribeBlob(blob);
   });
-  var ib=el('impBtn');
-  if(ib)ib.addEventListener('click',function(){
-    var ta=el('impBlob');
-    try{
-      var blob=JSON.parse(ta.value.trim());
-      if(!blob||typeof blob.s!=='string'||typeof blob.i!=='string'||typeof blob.c!=='string')throw new Error('not a sealed take');
-      var relay=store(K.relay)||[];
-      relay.push({id:'t'+Date.now().toString(36)+Math.random().toString(36).slice(2,6),at:Date.now(),pin:false,blob:{v:blob.v||1,alg:blob.alg||'',s:blob.s,i:blob.i,c:blob.c}});
-      saveRelay(relay);
-      log('sealed blob imported · the relay hop, simulated','good');
-      go(3);
-    }catch(e){
-      toast('That is not a sealed take: '+(e&&e.message||e));
-    }
-  });
-
-  if(S.screen===3&&S.sessionPass)fillDesk();
+  var db=el('discardBtn');
+  if(db)db.addEventListener('click',function(){S.failedAudio=null;S.take=null;go(0)});
 }
 
-function engineSet(e){
-  if(S.rec||S.engine===e){updatePipe();return}
-  S.engine=e;
-  savePrefs();
-  var es=el('engSpeech'),ew=el('engWhisper');
-  if(es)es.setAttribute('aria-pressed',String(e==='speech'));
-  if(ew)ew.setAttribute('aria-pressed',String(e==='whisper'));
-  var sb=el('sbEng');if(sb)sb.textContent=statusText();
-  log(e==='whisper'
-    ?'engine: Whisper — audio will never leave this machine'
-    :'engine: Web Speech — live captions, but the browser’s recognizer is in the loop',e==='whisper'?'good':'warn');
-  if(e==='whisper'&&!S.wh.ready&&!S.wh.loading)loadWhisper().catch(function(){});
-  updatePipe();lamps();
+/* ---- settings ---- */
+function openSettings(){
+  el('setYou').value=S.you;
+  el('setWs').value=S.ws;
+  syncFinishChoices();syncWaveChoices();
+  el('setLicLine').textContent=licState()?'Licensed.':'Trial · '+Math.max(0,TRIAL_LIMIT-trialUsed())+' takes left.';
+  el('setmodal').classList.add('up');
+}
+function syncFinishChoices(){
+  document.querySelectorAll('#finishChoices .choice').forEach(function(b){
+    b.setAttribute('aria-pressed',String(b.getAttribute('data-finish')===S.finish));
+  });
+}
+function syncWaveChoices(){
+  document.querySelectorAll('#waveChoices .choice').forEach(function(b){
+    b.setAttribute('aria-pressed',String(b.getAttribute('data-wave')===S.wave));
+  });
+}
+function applyFinish(){
+  var dark=S.finish==='dark'||(S.finish==='system'&&window.matchMedia&&matchMedia('(prefers-color-scheme: dark)').matches);
+  document.documentElement.setAttribute('data-theme',dark?'dark':'light');
+}
+function applyWave(){document.documentElement.setAttribute('data-wave',S.wave)}
+function savePrefs(){store(K.prefs,{ws:S.ws,you:S.you,finish:S.finish,wave:S.wave})}
+
+if(window.matchMedia){
+  var mq=matchMedia('(prefers-color-scheme: dark)');
+  var onSysChange=function(){if(S.finish==='system')applyFinish()};
+  if(mq.addEventListener)mq.addEventListener('change',onSysChange);
 }
 
-function savePrefs(){store(K.prefs,{ws:S.ws,engine:S.engine,theme:S.theme})}
-function applyTheme(){
-  document.documentElement.setAttribute('data-theme',S.theme==='dark'?'dark':'light');
-  var b=el('m-theme');
-  if(b){b.textContent=S.theme==='dark'?'Light':'Burst';b.setAttribute('aria-pressed',String(S.theme==='dark'))}
-}
 function licState(){var l=store(K.lic);return (l&&l.ok)?l:null}
 function trialUsed(){var t=store(K.trial);return (t&&t.used)||0}
 function updateLic(){
@@ -1669,7 +1676,6 @@ function hardStopIfLive(){
   var wasDemo=S.demo;
   S.rec=false;S.demo=false;
   stopTimers();
-  if(S.sr){S.sr.onend=null;try{S.sr.stop()}catch(e){}S.sr=null}
   if(S.mr&&S.mr.state!=='inactive'){S.mr.onstop=null;try{S.mr.stop()}catch(e){}}
   releaseStream();
   log((wasDemo?'demo':'take')+' discarded — navigated away mid-recording','warn');
@@ -1678,7 +1684,7 @@ function hardStopIfLive(){
 function go(s){
   hardStopIfLive();
   S.screen=s;
-  el('hardware').innerHTML=[screenCapture,screenReview,screenTicket,screenDesk][s]();
+  el('hardware').innerHTML=(s===0?screenCapture:screenTicket)();
   document.querySelectorAll('.tbtn').forEach(function(b){
     b.setAttribute('aria-pressed',b.getAttribute('data-s')==String(s));
   });
@@ -1688,32 +1694,46 @@ function go(s){
 document.querySelectorAll('.tbtn').forEach(function(b){
   b.addEventListener('click',function(){go(+b.getAttribute('data-s'))});
 });
-function mode(schem){
-  el('device-view').classList.toggle('off',schem);
-  el('schematic').classList.toggle('on',schem);
-  el('m-device').setAttribute('aria-pressed',String(!schem));
-  el('m-schem').setAttribute('aria-pressed',String(schem));
-}
-el('m-theme').addEventListener('click',function(){
-  S.theme=S.theme==='dark'?'light':'dark';
-  applyTheme();savePrefs();
-  log('finish: '+(S.theme==='dark'?'burst — ebony, rosewood, cream binding':'faceplate cream'));
-});
+
 el('licChip').addEventListener('click',openLicense);
-el('m-device').addEventListener('click',function(){mode(false)});
-el('m-schem').addEventListener('click',function(){mode(true)});
+el('btnSettings').addEventListener('click',openSettings);
+el('setClose').addEventListener('click',function(){el('setmodal').classList.remove('up')});
+document.querySelectorAll('#finishChoices .choice').forEach(function(b){
+  b.addEventListener('click',function(){
+    S.finish=b.getAttribute('data-finish');applyFinish();savePrefs();syncFinishChoices();
+    log('finish: '+S.finish);
+  });
+});
+document.querySelectorAll('#waveChoices .choice').forEach(function(b){
+  b.addEventListener('click',function(){
+    S.wave=b.getAttribute('data-wave');applyWave();savePrefs();syncWaveChoices();go(S.screen);
+    log('waveform palette: '+S.wave);
+  });
+});
+el('setYou').addEventListener('change',function(){S.you=el('setYou').value.trim();savePrefs()});
+el('setWs').addEventListener('change',function(){S.ws=el('setWs').value.trim()||'Your workspace';savePrefs()});
+el('setLicBtn').addEventListener('click',function(){el('setmodal').classList.remove('up');openLicense()});
+
+if(DEBUG){
+  el('device-view').insertAdjacentHTML('afterend','');
+  var dp=el('debugPane');if(dp)dp.classList.add('on');
+  var sb=document.querySelector('.headctl');
+  if(sb){
+    var schemBtn=document.createElement('button');
+    schemBtn.className='pill';schemBtn.id='m-schem';schemBtn.textContent='Schematic';
+    sb.insertBefore(schemBtn,sb.firstChild);
+    schemBtn.addEventListener('click',function(){
+      var on=el('schematic').classList.toggle('on');
+      el('device-view').classList.toggle('off',on);
+      schemBtn.textContent=on?'Device':'Schematic';
+    });
+  }
+}
 
 /* ---- boot ---- */
 (function boot(){
-  var relay=store(K.relay)||[];
-  var before=relay.length;
-  relay=relay.filter(function(r){return r.pin||Date.now()-r.at<TTL_MS});
-  if(relay.length<before){saveRelay(relay);log((before-relay.length)+' expired take(s) burned · 7 day TTL, pin to keep','warn')}
-  log('TAKE prototype booted · storage: '+(LSOK?'localStorage':'memory only — takes vanish when the tab closes'));
-  log('plaintext lives on this page and nowhere else · sealed blobs are the only export');
-  if(!(window.SpeechRecognition||window.webkitSpeechRecognition)){
-    log('no Web Speech API in this browser — Whisper is your engine here','warn');
-  }
+  log('TAKE booted · storage: '+(LSOK?'localStorage for preferences only':'memory only')+' · whisper is the only speech engine');
+  log('plaintext lives on this page and nowhere else · a share link is the only optional export');
   if(!window.isSecureContext){
     log('page is not a secure context — the mic may be blocked; serve over http://localhost or https, or use DEMO','bad');
   }
@@ -1746,10 +1766,14 @@ el('m-schem').addEventListener('click',function(){mode(true)});
   el('m-install').addEventListener('click',function(){
     if(S._install){S._install.prompt();S._install=null;el('m-install').style.display='none'}
   });
+
+  if(tryReceiver())return;
   go(0);
+  if(!S.wh.ready&&!S.wh.loading)loadWhisper().catch(function(){}); // quiet preload, no engine choice to make
 })();
 
 })();
+
 </script>
 </body>
 </html>

@@ -1,11 +1,11 @@
 {
   "name": "take-app",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "private": true,
-  "description": "TAKE — dictation instrument for ticket work. On-device transcription, deterministic field extraction, sealed sync.",
+  "description": "TAKE — dictation instrument for ticket work. On-device Whisper transcription, deterministic field extraction, ephemeral share links.",
   "scripts": {
     "start": "npx http-server -p 8080 -c-1 .",
     "keygen": "node keygen.mjs",
-    "test": "node --test"
+    "test": "node --test && node tools/verify.mjs"
   }
 }
