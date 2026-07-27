@@ -57,9 +57,12 @@ test('normalizeGain never produces a sample outside [-1, 1], regardless of input
   }
 });
 
-test('a normal-volume (built-in mic) recording is left alone by the caller, since peak >= 0.9 skips the boost', () => {
+test('an already-loud (built-in mic) recording is gently pulled to the same target, not left alone', () => {
   // this documents the call-site contract in transcribeBlob(): normalizeGain
-  // is only invoked when peak < 0.9, so an already-clear recording is untouched
+  // now runs unconditionally, so every take lands at a consistent peak
+  // regardless of source — "clear and loud by default", not just for takes
+  // already flagged quiet
   const pcm = new Float32Array([0.95, -0.9]);
-  assert.ok(maxAbs(pcm) >= 0.9);
+  normalizeGain(pcm, maxAbs(pcm));
+  assert.ok(Math.abs(maxAbs(pcm) - 0.92) < 1e-5);
 });

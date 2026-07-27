@@ -1385,8 +1385,18 @@ function toPCM16k(blob){
       try{ac.close()}catch(e){}
       var len=Math.max(1,Math.ceil(buf.duration*16000));
       var off=new OfflineAudioContext(1,len,16000);
-      var src=off.createBufferSource();
-      src.buffer=buf;src.connect(off.destination);src.start();
+      var src=off.createBufferSource();src.buffer=buf;
+      // Always-on speech compressor + makeup gain: evens out a quiet
+      // Bluetooth/bone-conduction mic against a hot built-in one, on every
+      // take, not just ones already flagged quiet — this is the main lever
+      // for "clear and loud by default." normalizeGain() below still runs
+      // as the final peak-safety pass regardless of what this produces.
+      var comp=off.createDynamicsCompressor();
+      comp.threshold.value=-45;comp.knee.value=24;comp.ratio.value=10;
+      comp.attack.value=0.003;comp.release.value=0.2;
+      var makeup=off.createGain();makeup.gain.value=2.6;
+      src.connect(comp);comp.connect(makeup);makeup.connect(off.destination);
+      src.start();
       return off.startRendering();
     }).then(function(out){return out.getChannelData(0)});
   });
@@ -1462,10 +1472,9 @@ function transcribeBlob(blob){
       toast('Didn’t hear anything. Check the mic and try again.');
       go(0);return;
     }
-    if(peak<0.9){
-      normalizeGain(pcm,peak);
-      log('boosted quiet audio '+(20*Math.log10(Math.min(0.92/peak,12))).toFixed(0)+'dB before transcribing — common with Bluetooth/earbud mics');
-    }
+    var gainDb=20*Math.log10(Math.min(0.92/peak,12));
+    normalizeGain(pcm,peak); // always run — a consistent target level for every take, not just ones already flagged quiet
+    if(gainDb>0.5)log('boosted audio '+gainDb.toFixed(0)+'dB before transcribing — common with Bluetooth/earbud/bone-conduction mics','good');
     return loadWhisper().then(function(){
       var t0=performance.now();
       return S.wh.pipe(pcm,{chunk_length_s:30,stride_length_s:5}).then(function(out){
