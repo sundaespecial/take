@@ -17,42 +17,50 @@
 <style>
   :root{
     /* material tokens — light finish: honey walnut + champagne aluminum */
-    --wood-a:#C08A4E; --wood-b:#7A4A22;
-    --metal-a:#F3EAD7; --metal-b:#CBB99B;
+    --wood-a:#A96936; --wood-b:#75431F; --wood-line:rgba(73,33,13,.25);
+    --metal-a:#F3EAD7; --metal-b:#C8B99E;
+    --hole:#30281E;
     --display:#F6F7F4; --display-ink:#171B22;
-    --ink:#171B22; --ink-soft:#5B5648;
-    --pilot:#F2A007; --pilot-deep:#C97F00;
+    --ink:#171B22; --ink-soft:#69727D;
+    --pilot:#F36B32; --pilot-deep:#D94725;
     --pine:#12594A; --pine-lit:#2E8570;
     --oxblood:#8E2B3A;
     --hair:rgba(23,20,16,.78);
+    --glass-line:rgba(23,27,34,.14);
     --shadow-edge:rgba(23,20,16,.55);
-    --shadow-soft:rgba(30,20,10,.28);
+    --shadow-soft:rgba(39,20,8,.55);
     --paper:#FFFDF6;
     --on-accent:#FBF8EF;
-    --grille-line:rgba(23,20,16,.16);
-    --glow-c:rgba(242,160,7,.35);
     --live-c:var(--oxblood);
+    /* waveform spectrum — six stops, overridden per palette below */
+    --sp-1:#ff5a36; --sp-2:#f3ab27; --sp-3:#27b27c; --sp-4:#14a7d5; --sp-5:#394de2; --sp-6:#d43d9e;
+    --glow-c: color-mix(in srgb, var(--sp-2) 32%, transparent);
   }
   [data-theme="dark"]{
     color-scheme:dark;
     /* material tokens — dark finish: smoked walnut + blackened aluminum */
-    --wood-a:#4A3018; --wood-b:#1E140A;
-    --metal-a:#38352F; --metal-b:#18160F;
-    --display:#0E0B09; --display-ink:#F3F0E6;
-    --ink:#F3F0E6; --ink-soft:#A79A82;
-    --pilot:#F5A623; --pilot-deep:#D98C0A;
+    --wood-a:#53301F; --wood-b:#24130D; --wood-line:rgba(5,2,1,.38);
+    --metal-a:#343330; --metal-b:#171716;
+    --hole:#050505;
+    --display:#090B11; --display-ink:#F3F6FB;
+    --ink:#F3F6FB; --ink-soft:#9AA6B6;
     --pine:#2E8570; --pine-lit:#3FA98C;
     --oxblood:#C25B6C;
     --hair:rgba(243,240,230,.28);
+    --glass-line:rgba(255,255,255,.12);
     --shadow-edge:rgba(0,0,0,.7);
-    --shadow-soft:rgba(0,0,0,.55);
+    --shadow-soft:rgba(0,0,0,.72);
     --paper:#211A10;
-    --grille-line:rgba(243,240,230,.14);
-    --glow-c:rgba(245,166,35,.28);
   }
-  [data-wave="bw"]{ --live-c:var(--ink); --glow-c:rgba(120,120,120,.28) }
-  [data-wave="amber"]{ --live-c:var(--pilot-deep); --glow-c:rgba(242,160,7,.35) }
-  [data-wave="rainbow"]{ --live-c:var(--oxblood); --glow-c:rgba(242,160,7,.35) }
+  [data-wave="mono"]{
+    --sp-1:#0d0d0e; --sp-2:#3b3b3e; --sp-3:#727276; --sp-4:#171719; --sp-5:#929296; --sp-6:#29292c;
+  }
+  [data-theme="dark"][data-wave="mono"]{
+    --sp-1:#f8f8f5; --sp-2:#d7d7d3; --sp-3:#a5a5a1; --sp-4:#ffffff; --sp-5:#bebeba; --sp-6:#ececE8;
+  }
+  [data-wave="amber"]{
+    --sp-1:#913300; --sp-2:#bd4d00; --sp-3:#e36d00; --sp-4:#ff9418; --sp-5:#ffc04a; --sp-6:#dc6000;
+  }
 
   *{box-sizing:border-box;margin:0;padding:0}
   html{-webkit-text-size-adjust:100%}
@@ -117,27 +125,55 @@
   .pill.armed{background:var(--pine);color:var(--on-accent);border-color:var(--pine)}
   .instbtn{display:none}
 
-  /* device shell */
-  .device{max-width:420px;margin:0 auto}
+  /* device shell — wood enclosure > metal screen > glass display, three material layers */
+  .device{
+    max-width:420px;margin:0 auto;position:relative;
+    padding:9px;border-radius:30px;
+    background:
+      repeating-linear-gradient(96deg,transparent 0 1.1rem,var(--wood-line) 1.15rem 1.22rem,transparent 1.28rem 2.2rem),
+      linear-gradient(104deg,var(--wood-b),var(--wood-a) 18%,var(--wood-b) 48%,var(--wood-a) 72%,var(--wood-b));
+    border:1px solid color-mix(in srgb,var(--wood-b) 75%,var(--metal-a));
+    box-shadow:.5rem .6rem 1.1rem var(--shadow-soft);
+  }
+  .device::before{
+    content:'';position:absolute;right:-6px;top:120px;width:9px;height:52px;border-radius:0 6px 6px 0;
+    background:repeating-linear-gradient(180deg,var(--metal-a) 0 3px,var(--metal-b) 3px 6px);
+    border:1px solid var(--metal-b);box-shadow:2px 2px 4px var(--shadow-soft);
+  }
+  .device::after{
+    content:'';display:block;width:64px;height:4px;margin:8px auto 0;border-radius:999px;
+    background:color-mix(in srgb,var(--wood-b) 65%,var(--metal-a));
+  }
   .screen{
-    background:radial-gradient(140% 160% at 15% -20%,rgba(255,255,255,.5),transparent 55%),var(--display);
-    border:1px solid var(--hair);border-radius:14px;
-    box-shadow:0 0 46px -14px var(--glow-c),inset 0 1px 0 rgba(255,255,255,.25);
+    background:
+      linear-gradient(100deg,transparent 0 45%,rgba(255,255,255,.16) 50%,transparent 55%),
+      linear-gradient(180deg,var(--metal-a),var(--metal-b));
+    border:1px solid color-mix(in srgb,var(--metal-b) 80%,var(--ink));
+    border-radius:22px;
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.4),inset 0 -1px 0 rgba(0,0,0,.12);
+    padding:7px;
     min-height:560px;display:flex;flex-direction:column;overflow:hidden;position:relative;
   }
 
   .statusbar{
     display:flex;justify-content:space-between;align-items:center;gap:8px;
-    padding:9px 14px;border-bottom:1px solid var(--hair);
+    padding:10px 14px;border-bottom:1px solid var(--glass-line);
+    background:radial-gradient(140% 160% at 15% -20%,rgba(255,255,255,.5),transparent 55%),var(--display);
+    border-radius:15px 15px 0 0;
     font-family:'IBM Plex Mono',monospace;font-size:9.5px;letter-spacing:.1em;
     text-transform:uppercase;color:var(--ink-soft);
+    box-shadow:0 0 40px -14px var(--glow-c);
   }
   .airplane{display:flex;align-items:center;gap:6px;font-weight:600;min-width:0}
   .airplane span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
   .dot{width:7px;height:7px;border-radius:50%;background:var(--pine);flex:0 0 auto}
   .dot.live{background:var(--live-c);box-shadow:0 0 6px var(--live-c)}
+  .clock{font-family:'IBM Plex Mono',monospace;font-size:13px;font-weight:600;letter-spacing:-.01em;color:var(--ink)}
 
-  .body{flex:1;overflow-y:auto;display:flex;flex-direction:column}
+  .body{
+    flex:1;overflow-y:auto;display:flex;flex-direction:column;
+    background:var(--display);border-radius:0 0 15px 15px;
+  }
   .body::-webkit-scrollbar{width:4px}
   .body::-webkit-scrollbar-thumb{background:var(--ink-soft)}
 
@@ -146,29 +182,26 @@
     text-transform:uppercase;color:var(--ink-soft);font-weight:600;
   }
 
-  /* grille + meter */
-  .grille{
-    background:linear-gradient(170deg,var(--metal-a),var(--metal-b));
-    border-bottom:1px solid var(--hair);
-    padding:16px 14px 14px;position:relative;
+  /* acoustic deck — decorative perforated grille strip above the glass */
+  .deckstrip{
+    height:22px;flex:0 0 auto;
+    background:
+      radial-gradient(circle,var(--hole) 0 1.6px,transparent 1.8px) 0 0/13px 13px,
+      linear-gradient(180deg,color-mix(in srgb,var(--metal-b) 82%,var(--ink)),var(--metal-b));
+    box-shadow:inset 0 3px 5px color-mix(in srgb,var(--shadow-soft) 45%,transparent);
+    border-radius:15px 15px 0 0;
   }
-  .meterhead{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:10px}
-  .clock{
-    font-family:'IBM Plex Mono',monospace;font-size:23px;font-weight:600;
-    letter-spacing:-.02em;color:var(--ink);
-  }
-  .vu{display:flex;gap:2.5px;align-items:flex-end;height:50px;background:var(--display);
-      border-radius:8px;border:1px solid var(--hair);padding:6px}
-  .seg{flex:1;background:rgba(120,120,120,.18);border-radius:2px;height:8%;transition:height .07s linear}
-  .seg.lit{background:var(--seg-c,var(--pilot))}
-  .seg.peak{filter:brightness(1.3) saturate(1.15)}
-  .scale{
-    display:flex;justify-content:space-between;margin-top:5px;
-    font-family:'IBM Plex Mono',monospace;font-size:8.5px;color:var(--ink-soft);
-  }
+  .deckstrip + .body{border-radius:0 0 15px 15px}
+  .device .screen > .deckstrip + .statusbar{border-radius:0}
+
+  /* live waveform */
+  .wavewrap{padding:6px 10px 0}
+  .wave{display:block;width:100%;height:auto;filter:saturate(1.12)}
+  [data-theme="dark"] .wave{filter:saturate(1.2) drop-shadow(0 0 5px color-mix(in srgb,var(--sp-5) 30%,transparent))}
+  .waveaxis{stroke:var(--glass-line);stroke-width:1}
 
   /* transcript */
-  .live{padding:14px;flex:1;min-height:110px}
+  .live{padding:10px 14px 14px;flex:1;min-height:96px}
   .live .eyebrow{margin-bottom:8px;display:block}
   .caret{display:inline-block;width:7px;height:15px;background:var(--pilot);
          vertical-align:-2px;margin-left:2px}
@@ -177,7 +210,9 @@
   #tint{color:var(--ink-soft)}
   .placeholder{color:var(--ink-soft);font-size:13.5px;line-height:1.6}
 
-  .tray{padding:12px 14px 14px;border-top:1px solid var(--hair);background:linear-gradient(170deg,var(--metal-a),var(--metal-b))}
+  .tray{padding:12px 14px 14px;margin-top:9px;border-radius:18px;
+    background:linear-gradient(100deg,transparent 0 45%,rgba(255,255,255,.14) 50%,transparent 55%),linear-gradient(180deg,var(--metal-a),var(--metal-b));
+    border:1px solid color-mix(in srgb,var(--metal-b) 80%,var(--ink));box-shadow:inset 0 1px 0 rgba(255,255,255,.35)}
   .chip{
     display:inline-block;font-family:'IBM Plex Mono',monospace;font-size:9.5px;
     letter-spacing:.08em;text-transform:uppercase;border:1px solid var(--hair);border-radius:20px;
@@ -191,16 +226,21 @@
   .rec-row{display:flex;align-items:center;gap:14px;margin-top:10px}
   .rec{
     width:66px;height:66px;flex:0 0 66px;border-radius:50%;
-    border:1px solid var(--hair);
-    background:radial-gradient(circle at 35% 30%,#ffce6b,var(--pilot) 55%,var(--pilot-deep) 100%);
-    cursor:pointer;box-shadow:0 3px 0 var(--pilot-deep),0 6px 14px -4px var(--shadow-soft);
+    border:.16rem solid color-mix(in srgb,var(--pilot-deep) 78%,var(--ink));
+    background:
+      repeating-radial-gradient(circle,transparent 0 5px,rgba(60,10,0,.11) 5.3px 5.8px),
+      linear-gradient(145deg,#f27b42,var(--pilot-deep));
+    cursor:pointer;box-shadow:inset 0 3px 4px rgba(255,255,255,.28),0 4px 6px var(--shadow-soft);
     display:flex;align-items:center;justify-content:center;
     font-family:'Archivo Black',sans-serif;font-size:11px;letter-spacing:-.02em;
-    transition:transform .06s,box-shadow .06s;color:#3a2400;
+    transition:transform .06s,box-shadow .06s;color:#3a1206;
   }
-  .rec:active{transform:translateY(2px);box-shadow:0 1px 0 var(--pilot-deep)}
-  .rec.live{background:radial-gradient(circle at 35% 30%,#ff9d8a,var(--live-c) 55%,var(--oxblood) 100%);color:var(--on-accent);
-    box-shadow:0 3px 0 var(--oxblood),0 0 22px -2px var(--live-c)}
+  .rec:active{transform:translateY(2px)}
+  .rec.live{background:
+      repeating-radial-gradient(circle,transparent 0 5px,rgba(0,0,0,.16) 5.3px 5.8px),
+      linear-gradient(145deg,#ff9d8a,var(--live-c));
+    border-color:color-mix(in srgb,var(--oxblood) 78%,var(--ink));color:var(--on-accent);
+    box-shadow:inset 0 3px 4px rgba(255,255,255,.2),0 0 20px -3px var(--live-c)}
   .rec-note{font-family:'IBM Plex Mono',monospace;font-size:10px;line-height:1.5;color:var(--ink-soft)}
   .prog{height:6px;border-radius:6px;background:rgba(120,120,120,.2);margin-top:9px;display:none;overflow:hidden}
   .prog i{display:block;height:100%;background:var(--pilot);width:0%}
@@ -245,6 +285,13 @@
   .act:disabled{opacity:.45;cursor:not-allowed}
   .actrow{display:flex;gap:8px;margin-top:10px}
   .actrow .act{flex:1}
+  .act.grad{
+    border-radius:999px;border:none;color:#fff;
+    background:linear-gradient(100deg,var(--sp-5),var(--sp-6));
+    box-shadow:0 2px 6px color-mix(in srgb,var(--sp-6) 45%,transparent);
+  }
+  .act.grad:active{box-shadow:0 1px 2px color-mix(in srgb,var(--sp-6) 45%,transparent)}
+  .actrow .act.ghost{border-radius:999px;background:color-mix(in srgb,var(--ink) 8%,var(--display))}
 
   /* ticket text */
   .ticket{
@@ -584,7 +631,7 @@
       <span class="eyebrow">Waveform color</span>
       <div class="choices" id="waveChoices">
         <button class="choice" data-wave="rainbow">Rainbow</button>
-        <button class="choice" data-wave="bw">Black &amp; White</button>
+        <button class="choice" data-wave="mono">Black &amp; White</button>
         <button class="choice" data-wave="amber">Amber</button>
       </div>
     </div>
@@ -976,7 +1023,6 @@ var DEMO_TAPE="Ticket for Marla Bennett, Cincinnati office. She's getting the Du
 var TRIAL_LIMIT=10;
 var BUY_URL='';/* your Gumroad / Lemon Squeezy / Stripe payment link */
 var PUBKEY_JWK={"key_ops":["verify"],"ext":true,"kty":"EC","x":"V9uN1IxgX0sv69zPFO5NeV5oLC7kS_bslHK40OqPU7Q","y":"Dhz-cl_b4rTcWO1w0yZjHQ2iTZgNf7ZzeTMyIGqT3rk","crv":"P-256"};/* rotate before selling: node tools/keygen.mjs init --write */
-var WAVE_STOPS=['#F2545B','#F2A007','#3FA98C','#2E8570','#3B7FC4','#8E5BC2']; // rainbow spectrum, orange-forward per brief
 
 /* storage — localStorage when the browser allows it, memory otherwise.
    Only preferences and license/trial state are ever persisted — never
@@ -1005,7 +1051,7 @@ var S={
 var prefs=store(K.prefs)||{};
 if(prefs.ws)S.ws=prefs.ws;
 if(prefs.you)S.you=prefs.you;
-if(prefs.wave==='rainbow'||prefs.wave==='bw'||prefs.wave==='amber')S.wave=prefs.wave;
+if(prefs.wave==='rainbow'||prefs.wave==='mono'||prefs.wave==='amber')S.wave=prefs.wave;
 S.finish=(prefs.finish==='dark'||prefs.finish==='light'||prefs.finish==='system')?prefs.finish:'system';
 applyFinish();
 applyWave();
@@ -1100,13 +1146,22 @@ function statusText(){
 }
 
 function screenCapture(){
-  var segs='';for(var i=0;i<22;i++)segs+='<i class="seg" style="--seg-c:'+waveColor(i)+'"></i>';
   return '<div class="device"><div class="screen">'
-  +'<div class="statusbar"><span class="airplane"><i class="dot" id="sbDot"></i><span id="sbEng">'+esc(statusText())+'</span></span></div>'
+  +'<div class="deckstrip" aria-hidden="true"></div>'
+  +'<div class="statusbar"><span class="airplane"><i class="dot" id="sbDot"></i><span id="sbEng">'+esc(statusText())+'</span></span><span class="clock" id="clock">00:00</span></div>'
   +'<div class="body">'
-    +'<div class="grille"><div class="meterhead"><span class="eyebrow">Input</span><span class="clock" id="clock">00:00</span></div>'
-      +'<div class="vu" id="vu">'+segs+'</div>'
-      +'<div class="scale"><span>-40</span><span>-20</span><span>-10</span><span>-3</span><span>0</span></div></div>'
+    +'<div class="wavewrap"><svg class="wave" viewBox="0 0 320 122" role="img" aria-label="Live audio waveform">'
+      +'<defs><linearGradient id="waveGrad" x1="0" x2="1">'
+        +'<stop offset="0" style="stop-color:var(--sp-1)"/>'
+        +'<stop offset=".2" style="stop-color:var(--sp-2)"/>'
+        +'<stop offset=".4" style="stop-color:var(--sp-3)"/>'
+        +'<stop offset=".6" style="stop-color:var(--sp-4)"/>'
+        +'<stop offset=".8" style="stop-color:var(--sp-5)"/>'
+        +'<stop offset="1" style="stop-color:var(--sp-6)"/>'
+      +'</linearGradient></defs>'
+      +'<path id="wavepath" fill="url(#waveGrad)" d="'+waveFlatPath()+'"/>'
+      +'<line x1="0" y1="61" x2="320" y2="61" class="waveaxis"/>'
+    +'</svg></div>'
     +'<div class="live"><span class="eyebrow">Heard so far</span>'
       +'<div id="tape"><span class="placeholder" id="ph">Press the amber button and describe what happened the way you would tell a colleague. Whisper transcribes on this machine after you stop. No mic handy? Press DEMO.</span>'
       +'<span id="tfin"></span><span id="tint"></span><i class="caret off" id="car"></i></div></div>'
@@ -1123,16 +1178,17 @@ function screenCapture(){
   +'</div></div>';
 }
 
-function waveColor(i){
-  if(S.wave==='bw')return 'var(--ink)';
-  if(S.wave==='amber')return 'var(--pilot)';
-  var n=WAVE_STOPS.length,pos=(i/21)*(n-1),lo=Math.floor(pos),hi=Math.min(n-1,lo+1);
-  return lo===hi?WAVE_STOPS[lo]:mixHex(WAVE_STOPS[lo],WAVE_STOPS[hi],pos-lo);
+/* ---- live waveform: real analyser samples become a filled SVG ribbon ---- */
+var WAVE_N=33;
+function waveXY(amps){
+  var w=320,cy=61,half=52,n=amps.length,step=w/(n-1),d='',i,x,y;
+  for(i=0;i<n;i++){x=(i*step).toFixed(1);y=(cy-amps[i]*half).toFixed(1);d+=(i===0?'M':'L')+x+','+y+' '}
+  for(i=n-1;i>=0;i--){x=(i*step).toFixed(1);y=(cy+amps[i]*half).toFixed(1);d+='L'+x+','+y+' '}
+  return d+'Z';
 }
-function mixHex(a,b,t){
-  function h2r(h){h=h.replace('#','');return [parseInt(h.slice(0,2),16),parseInt(h.slice(2,4),16),parseInt(h.slice(4,6),16)]}
-  var A=h2r(a),B=h2r(b),r=A.map(function(c,i){return Math.round(c+(B[i]-c)*t)});
-  return 'rgb('+r.join(',')+')';
+function waveFlatPath(){
+  var a=[];for(var i=0;i<WAVE_N;i++)a.push(0.03);
+  return waveXY(a);
 }
 
 function fieldHTML(f){
@@ -1178,7 +1234,7 @@ function screenTicket(){
     +'<div class="screentitle" style="margin-top:16px">Ready to paste</div>'
     +'<span class="eyebrow" style="display:block;margin-bottom:9px">'+(narrative?'Narrative house style':'Structured fields — narrative style needs a name, requester, and resolution')+'</span>'
     +ticketBody
-    +'<div class="actrow"><button class="act" id="copyTicket">Copy ticket</button><button class="act ghost" id="shareTicket">Share</button></div>'
+    +'<div class="actrow"><button class="act grad" id="copyTicket">Copy ticket</button><button class="act ghost" id="shareTicket">Share</button></div>'
   +'</div></div>'
   +'<div class="toast" id="toast"></div></div></div>';
 }
@@ -1201,30 +1257,27 @@ function releaseStream(){
   if(S.ac){try{S.ac.close()}catch(e){}S.ac=null;S.an=null}
   if(S.wakeLock){try{S.wakeLock.release()}catch(e){}S.wakeLock=null}
 }
-function paintVU(lvl){
-  var segs=document.querySelectorAll('#vu .seg');
-  segs.forEach(function(s,i){
-    var h=Math.max(8,(lvl*100)*(0.55+0.45*Math.sin(i*0.9+Date.now()/170)));
-    h=Math.min(100,h);
-    s.style.height=h+'%';
-    s.className='seg'+(h>82?' peak':(h>26?' lit':''));
-  });
+function paintWave(amps){
+  var p=el('wavepath');if(p)p.setAttribute('d',waveXY(amps));
 }
 function zeroVU(){
-  document.querySelectorAll('#vu .seg').forEach(function(s){s.style.height='8%';s.className='seg'});
+  var p=el('wavepath');if(p)p.setAttribute('d',waveFlatPath());
 }
 function startVU(){
   S.ac=new (window.AudioContext||window.webkitAudioContext)();
   if(S.ac.state==='suspended')S.ac.resume().catch(function(){});
   var src=S.ac.createMediaStreamSource(S.stream);
-  S.an=S.ac.createAnalyser();S.an.fftSize=512;
+  S.an=S.ac.createAnalyser();S.an.fftSize=1024;
   src.connect(S.an);
   var data=new Uint8Array(S.an.fftSize);
   S.meter=setInterval(function(){
     S.an.getByteTimeDomainData(data);
-    var sum=0;
-    for(var i=0;i<data.length;i++){var v=(data[i]-128)/128;sum+=v*v}
-    paintVU(Math.min(1,Math.sqrt(sum/data.length)*4.5));
+    var amps=[],step=Math.floor(data.length/WAVE_N);
+    for(var i=0;i<WAVE_N;i++){
+      var v=(data[i*step]-128)/128;
+      amps.push(Math.max(-1,Math.min(1,v*2.2)));
+    }
+    paintWave(amps);
   },70);
 }
 function startClock(){
@@ -1435,7 +1488,11 @@ function runDemo(){
   var ph=el('ph');if(ph)ph.remove();
   el('recnote').innerHTML='Demo tape rolling — no microphone involved.<br>Tap STOP to cut it early.';
   setLiveUI(true);startClock();
-  S.meter=setInterval(function(){paintVU(0.35+Math.random()*0.5)},70);
+  S.meter=setInterval(function(){
+    var amps=[],t=Date.now()/160;
+    for(var i=0;i<WAVE_N;i++)amps.push(0.22+0.55*Math.abs(Math.sin(i*0.5+t)));
+    paintWave(amps);
+  },70);
   var words=DEMO_TAPE.split(' '),i=0;
   S.demoI=setInterval(function(){
     if(i>=words.length){stopDemo();return}
@@ -1706,7 +1763,7 @@ document.querySelectorAll('#finishChoices .choice').forEach(function(b){
 });
 document.querySelectorAll('#waveChoices .choice').forEach(function(b){
   b.addEventListener('click',function(){
-    S.wave=b.getAttribute('data-wave');applyWave();savePrefs();syncWaveChoices();go(S.screen);
+    S.wave=b.getAttribute('data-wave');applyWave();savePrefs();syncWaveChoices();
     log('waveform palette: '+S.wave);
   });
 });

@@ -38,9 +38,9 @@ const html = readFileSync(path.join(root, 'index.html'), 'utf8');
 
 // 3. all three waveform presets present
 {
-  const required = ['rainbow', 'bw', 'amber'];
+  const required = ['rainbow', 'mono', 'amber'];
   const missing = required.filter((w) => !html.includes('data-wave="' + w + '"'));
-  if (!missing.length) ok('all three waveform presets present (rainbow, bw, amber)');
+  if (!missing.length) ok('all three waveform presets present (rainbow, mono, amber)');
   else fail('missing waveform preset(s): ' + missing.join(', '));
 }
 
