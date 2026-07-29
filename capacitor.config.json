@@ -1,7 +1,7 @@
 {
-  "appId": "com.yourdomain.take",
+  "appId": "com.sundaespecial.take",
   "appName": "TAKE",
-  "webDir": ".",
+  "webDir": "www",
   "server": {
     "androidScheme": "https"
   }

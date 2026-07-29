@@ -7,5 +7,10 @@
     "start": "npx http-server -p 8080 -c-1 .",
     "keygen": "node keygen.mjs",
     "test": "node --test && node tools/verify.mjs"
+  },
+  "dependencies": {
+    "@capacitor/android": "^8.4.2",
+    "@capacitor/cli": "^8.4.2",
+    "@capacitor/core": "^8.4.2"
   }
 }
