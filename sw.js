@@ -1,7 +1,7 @@
 /* TAKE service worker — app shell cached for offline use.
    Whisper model files are NOT cached here: transformers.js keeps its own
    Cache API store ('transformers-cache'), so the model survives offline anyway. */
-var CACHE = 'take-v0.3.5';
+var CACHE = 'take-v0.3.6';
 var SHELL = [
   './',
   './index.html',
