@@ -28,35 +28,47 @@ Bug reports to yourself: add `?debug=1` to the URL and the operator's log narrat
 
 Fast lane for Android sessions (optional, skips deploying): connect the phone by USB, enable USB debugging, open `chrome://inspect#devices` on the PC, add a port forward `8080 → localhost:8080`, run the local server, and browse to `localhost:8080` on the phone. That counts as a secure context, so the mic works with zero deploys. iPhone has no Mac-free equivalent — but with sub-minute Pages deploys you will not miss it.
 
-## Phase 3a — Google Play (your first store; all of it works on Windows)
+## Phase 3a — Google Play (your first store; all of it works on Windows, no Android Studio required)
 
-What you need: Node.js, Android Studio, a Google Play Console account ($25, one time).
+What you need: Node.js, a JDK, the Android SDK command-line tools, a Google Play Console account ($25, one time). This machine has no admin rights, so instead of the Android Studio installer, the toolchain is portable zips extracted under `%LOCALAPPDATA%\AndroidToolchain`:
 
 ```
-cd take-app
-npm install @capacitor/core @capacitor/cli @capacitor/android
-npx cap add android
-npx cap open android
+%LOCALAPPDATA%\AndroidToolchain\jdk21\jdk-21.0.12+8      # JDK 21 — Capacitor 8's Android build requires 21, not 17
+%LOCALAPPDATA%\AndroidToolchain\sdk                       # Android SDK: platform-tools, platforms;android-36, build-tools;36.0.0
 ```
 
-Before building, two edits. In `android/app/src/main/AndroidManifest.xml` add:
+`android/local.properties` points `sdk.dir` at that SDK path. (If Android Studio is ever installed properly later, it can just take over this same `sdk.dir` — nothing here is incompatible with it.)
+
+The Capacitor project is already scaffolded (`npx cap add android`, `android/` — gitignored, regenerate with the same command if it's ever missing) with the app ID `com.sundaespecial.take` in `capacitor.config.json`, and mic permissions already added to `android/app/src/main/AndroidManifest.xml`:
 
 ```xml
 <uses-permission android:name="android.permission.RECORD_AUDIO" />
 <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />
 ```
 
-And decide the store pricing model (this matters for policy): both Google and Apple require digital goods sold inside an app to use their own billing. Selling Gumroad license keys from inside a store app violates that. The clean split — the web PWA stays free-with-license-keys, the store build is a paid app with the gate removed. For store builds only, change one line in `index.html`:
+**Both `android/` and its manifest edit are gitignored — if this project is ever re-scaffolded from scratch, redo the app ID and these two permission lines before building.**
 
-```js
-function gateOK(){return true}       // store build: paid upfront, no key gate
+Store pricing model: both Google and Apple require digital goods sold inside an app to use their own billing, so the web PWA stays free-with-license-keys while the store build is a paid-upfront app with the gate removed. `tools/build-store.mjs` handles this automatically — it regenerates `www/` (gitignored) from the current `index.html` with `gateOK(){return true}` and `BUY_URL` cleared, leaving the real web app at the repo root untouched. Run it before every sync:
+
+```
+node tools/build-store.mjs
+npx cap sync android
 ```
 
-(Leave `BUY_URL` empty in store builds so no external purchase link renders. Keep the web version exactly as it is.)
+**Signing.** The release keystore already exists at `keys/take-release.keystore` (gitignored, alias `take`) — **this is the single most important file in this entire project to back up.** Losing it means this app listing can never receive another update, ever; Google cannot help recover it. Copy it to a password manager or encrypted backup now if that hasn't happened yet. The store/key password is not written to disk anywhere — it needs to be supplied as an environment variable when building:
+
+```
+cd android
+$env:JAVA_HOME = "$env:LOCALAPPDATA\AndroidToolchain\jdk21\jdk-21.0.12+8"    # PowerShell
+$env:TAKE_KEYSTORE_PASS = "<the password>"
+.\gradlew.bat bundleRelease --no-daemon
+```
+
+Output: `android/app/build/outputs/bundle/release/app-release.aab` — this is the file that gets uploaded to Play Console. (A debug build for on-device testing, no signing needed, is `.\gradlew.bat assembleDebug --no-daemon`, output as an installable `.apk` under `android/app/build/outputs/apk/debug/`.)
 
 Whisper is the only engine, on the web build and the wrapped one alike, so there's no WebView-specific fallback to worry about.
 
-Then: plug in your Android phone (USB debugging on) and press Run ▶ in Android Studio — the real native app installs on your phone. That is your native test loop; after web edits run `npx cap sync` and Run again. When it feels right: Build → Generate Signed App Bundle (create a keystore, let Play App Signing manage the rest), then in Play Console create the app, upload the AAB to the Internal testing track (instant, shareable link, up to 100 testers), fill the Data safety form — genuinely pleasant for this app: microphone processed on-device, no data collected, no data shared — plus a content rating questionnaire and a privacy policy URL (a PRIVACY page on your Pages site is fine). Promote Internal → Production when ready. First reviews typically take a few days; Google's cut on a paid app is 15% up to $1M/yr.
+In Play Console: create the app, upload the `.aab` to the Internal testing track (instant, shareable link, up to 100 testers), fill the Data safety form — genuinely pleasant for this app: microphone processed on-device, no data collected, no data shared — plus a content rating questionnaire and a privacy policy URL (the live PRIVACY.md page works for this). Promote Internal → Production when ready. First reviews typically take a few days; Google's cut on a paid app is 15% up to $1M/yr.
 
 ## Phase 3b — Apple App Store (needs Mac access; do it when it earns its cost)
 
