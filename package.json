@@ -1,8 +1,8 @@
 {
-  "name": "take-app",
-  "version": "0.3.0",
+  "name": "say-so-app",
+  "version": "0.4.0",
   "private": true,
-  "description": "TAKE — dictation instrument for ticket work. On-device Whisper transcription, deterministic field extraction, ephemeral share links.",
+  "description": "SAY SO — dictation instrument for ticket work. On-device Whisper transcription, deterministic field extraction, ephemeral share links.",
   "scripts": {
     "start": "npx http-server -p 8080 -c-1 .",
     "keygen": "node keygen.mjs",

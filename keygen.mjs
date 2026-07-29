@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-/* TAKE license tool — ECDSA P-256, WebCrypto, no dependencies.
+/* SAY SO license tool — ECDSA P-256, WebCrypto, no dependencies.
  *
  *   node keygen.mjs init [--write]     make a fresh keypair
  *                                            (--write also swaps the public key into index.html)
@@ -76,7 +76,7 @@ async function issue(email, days) {
 async function verify(lic) {
   if (!lic) { console.error('Usage: node keygen.mjs verify <key>'); process.exit(1); }
   const p = lic.trim().split('.');
-  if (p.length !== 3 || p[0] !== 'TAKE1') { console.error('not a TAKE key'); process.exit(1); }
+  if (p.length !== 3 || p[0] !== 'TAKE1') { console.error('not a SAY SO key'); process.exit(1); }
   const key = await loadPub();
   const ok = await subtle.verify({ name: 'ECDSA', hash: 'SHA-256' }, key,
     Buffer.from(p[2], 'base64url'), enc(p[1]));

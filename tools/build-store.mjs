@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-/* Builds the Google Play variant of TAKE into www/.
+/* Builds the Google Play variant of SAY SO into www/.
  *
  * The web app (index.html at the repo root) keeps the real trial + license
  * key gate — that's what's sold directly. Google requires apps sold through

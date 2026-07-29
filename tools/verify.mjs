@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// Dependency-light structural checks for TAKE. Complements test/*.test.js
+// Dependency-light structural checks for SAY SO. Complements test/*.test.js
 // (which cover the pure extraction/rendering logic) by checking the shape
 // of the shipped app: nav surface, engine, waveform presets, PWA files,
 // service worker cache bump, and plain JS syntax validity.

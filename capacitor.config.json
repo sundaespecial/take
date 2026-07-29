@@ -1,6 +1,6 @@
 {
-  "appId": "com.sundaespecial.take",
-  "appName": "TAKE",
+  "appId": "com.sundaespecial.sayso",
+  "appName": "SAY SO",
   "webDir": "www",
   "server": {
     "androidScheme": "https"

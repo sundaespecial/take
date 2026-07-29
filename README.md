@@ -1,8 +1,8 @@
-# TAKE
+# SAY SO
 
-Dictation instrument for ticket work. Press REC, talk the way you would tell a colleague, stop — TAKE transcribes on-device with Whisper, extracts the facts into fields (fills, never composes), and renders a ticket. Two screens only: **Capture** and **Ticket**. Everything else — finish, waveform color, your name, license — lives behind the settings gear so it never competes with those two.
+Dictation instrument for ticket work. Press REC, talk the way you would tell a colleague, stop — SAY SO transcribes on-device with Whisper, extracts the facts into fields (fills, never composes), and renders a ticket. Two screens only: **Capture** and **Ticket**. Everything else — finish, waveform color, your name, license — lives behind the settings gear so it never competes with those two.
 
-Whisper is the only speech engine; it runs entirely on the device, model and all. Two material finishes (Light, Dark, or System) and three waveform color presets (Rainbow, Black & White, Amber). Sharing a finished ticket to a desktop is a link, not an account: Private links are AES-256-GCM sealed with a passphrase you choose, Open links are plainly encoded and say so before you generate one. Either way there is no server — the link carries the ticket, the same way a video link carries a video ID. Opening a TAKE share link renders a small "legal pad" receiver page with Copy and Clear; nothing is ever stored.
+Whisper is the only speech engine; it runs entirely on the device, model and all. Two material finishes (Light, Dark, or System) and three waveform color presets (Rainbow, Black & White, Amber). Sharing a finished ticket to a desktop is a link, not an account: Private links are AES-256-GCM sealed with a passphrase you choose, Open links are plainly encoded and say so before you generate one. Either way there is no server — the link carries the ticket, the same way a video link carries a video ID. Opening a SAY SO share link renders a small "legal pad" receiver page with Copy and Clear; nothing is ever stored.
 
 One HTML file, no build step, no backend required.
 
@@ -47,27 +47,13 @@ This is a PWA. On Android Chrome, the Install button lights up in the header (or
 
 ## Real Android / iOS store apps (when you want them)
 
-The web app wraps cleanly with Capacitor. What it costs: Google Play $25 once, Apple $99/year, an Android Studio install, and a Mac with Xcode for iOS. Whisper is the only engine on the web build too now, so there is no store-WebView caveat to work around — the wrapped app behaves the same as the PWA.
-
-```
-npm install @capacitor/core @capacitor/cli
-npx cap init TAKE com.yourdomain.take --web-dir .
-npx cap add android    # then: npx cap open android
-npx cap add ios        # Mac only: npx cap open ios
-```
-
-Android — add to `android/app/src/main/AndroidManifest.xml`:
-
-```xml
-<uses-permission android:name="android.permission.RECORD_AUDIO" />
-<uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />
-```
+The web app wraps cleanly with Capacitor. What it costs: Google Play $25 once, Apple $99/year, and (for iOS only) a Mac with Xcode. Whisper is the only engine on the web build too now, so there is no store-WebView caveat to work around — the wrapped app behaves the same as the PWA. Android builds entirely on Windows without Android Studio, using a portable JDK 21 + SDK command-line toolchain — see SHIP.md's "Phase 3a" for the full, current setup and build commands; that's the source of truth, this README doesn't duplicate it.
 
 iOS — add to `ios/App/App/Info.plist`:
 
 ```xml
 <key>NSMicrophoneUsageDescription</key>
-<string>TAKE transcribes your dictation on this device. Audio never leaves it.</string>
+<string>SAY SO transcribes your dictation on this device. Audio never leaves it.</string>
 ```
 
 Store apps also let you swap the license gate for real in-app purchase later, which Apple requires for digital goods sold inside iOS apps — another reason the PWA-first route is the sensible start.

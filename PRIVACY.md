@@ -6,7 +6,7 @@ architecture — a relay service, an on-device LLM extractor — that is a desig
 not shipped code, and is labeled "planned" there. This document only covers what
 runs today.
 
-TAKE is a single HTML page. There is no backend, no account, no analytics, and no
+SAY SO is a single HTML page. There is no backend, no account, no analytics, and no
 crash reporting anywhere in the code.
 
 ## Your voice
@@ -32,7 +32,7 @@ a field that wasn't said stays empty rather than being guessed or filled in.
 
 The rendered ticket text works the same way: the narrative "house style" sentence
 template only fills in phrases the extractor actually pulled from your transcript.
-If a required fact (requester, what happened, what was done) wasn't said, TAKE does
+If a required fact (requester, what happened, what was done) wasn't said, SAY SO does
 not force the wording — it shows the structured field view instead, where anything
 missing is visibly flagged rather than papered over.
 
@@ -61,18 +61,18 @@ video link than saving to a database:
   AES-256-GCM, key derived by PBKDF2 (310,000 iterations, SHA-256) from a
   passphrase you choose. The passphrase is never included in the link, never
   stored, and never transmitted — you send it to the recipient a different way.
-- **Open**: the payload is Base64URL-encoded, not encrypted. TAKE shows an explicit
+- **Open**: the payload is Base64URL-encoded, not encrypted. SAY SO shows an explicit
   "anyone with this link can read the ticket" warning before generating one.
 
 Either way, the payload lives entirely in the URL fragment (`#take=...`), which
 browsers never send to a server — so even though the link *looks* like it points at
 a page, nothing about its content is transmitted anywhere by opening it. Opening a
-TAKE share link on another device renders a minimal receiver page that decodes it
+SAY SO share link on another device renders a minimal receiver page that decodes it
 client-side, shows the ticket text with Copy and Clear, and writes nothing to
 storage. Clearing the receiver also strips the fragment from the address bar.
 
 There is no server anywhere in this flow. You are responsible for how the link
-itself travels (native share sheet, message, email) — TAKE only makes the link.
+itself travels (native share sheet, message, email) — SAY SO only makes the link.
 
 ## Network requests this page makes
 

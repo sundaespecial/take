@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>TAKE · Dictation Instrument</title>
+<title>SAY SO · Dictation Instrument</title>
 <link rel="manifest" href="manifest.webmanifest">
 <meta name="theme-color" content="#F6F1E6" media="(prefers-color-scheme: light)">
 <meta name="theme-color" content="#0E0B09" media="(prefers-color-scheme: dark)">
@@ -458,7 +458,7 @@
 <!-- ============ LEGAL-PAD RECEIVER (shown only when a #take= share link is opened) ============ -->
 <div id="receiver">
   <div class="padwrap">
-    <div class="padtitle">TAKE · shared ticket</div>
+    <div class="padtitle">SAY SO · shared ticket</div>
     <div id="receiverBody"></div>
   </div>
 </div>
@@ -468,7 +468,7 @@
   <div class="bar">
     <div class="mark">
       <div>
-        <h1>TAKE</h1>
+        <h1>SAY SO</h1>
         <div class="sub">Dictation instrument for ticket work</div>
       </div>
       <div class="lamps">
@@ -622,7 +622,7 @@
 <!-- license modal -->
 <div class="modal" id="lmodal" role="dialog" aria-modal="true" aria-labelledby="lTitle">
   <div class="mbox">
-    <h3 id="lTitle">Unlock TAKE</h3>
+    <h3 id="lTitle">Unlock SAY SO</h3>
     <p>Paste the license key from your purchase email. It is verified on this page against a public key — offline, nothing is phoned home. The trial covers 10 real takes; the demo is always free.</p>
     <textarea id="lKey" spellcheck="false" placeholder="TAKE1.…"></textarea>
     <div class="mrow">
@@ -677,7 +677,7 @@
 
 <script>
 /* ================================================================
-   TAKE · working prototype
+   SAY SO · working prototype
    Everything runs in this page. Nothing leaves it except:
    - the one-time Whisper model download
    - a share link, only when you generate and send one yourself
@@ -1008,7 +1008,7 @@ function bytesFromB64u(str){
 function parseLicense(key){
   key=String(key||'').trim().replace(/\s+/g,'');
   var p=key.split('.');
-  if(p.length!==3||p[0]!=='TAKE1')throw new Error('not a TAKE key');
+  if(p.length!==3||p[0]!=='TAKE1')throw new Error('not a SAY SO key');
   var payload;
   try{payload=JSON.parse(new TextDecoder().decode(bytesFromB64u(p[1])))}
   catch(e){throw new Error('malformed payload')}
@@ -1049,7 +1049,7 @@ if(typeof document!=='undefined')(function(){
 'use strict';
 
 var DEBUG=/(?:^|[?&])debug=1(?:&|$)/.test(location.search);
-var K={prefs:'take.prefs.v1',lic:'take.lic.v1',trial:'take.trial.v1'};
+var K={prefs:'sayso.prefs.v1',lic:'sayso.lic.v1',trial:'sayso.trial.v1'};
 var DEMO_TAPE="Ticket for Marla Bennett, Cincinnati office. She's getting the Duo push but it times out before she can approve it. Started this morning right after her phone swap. Her old handset is still showing active in the Duo admin console, so this looks like a stale enrollment. I removed the orphaned device, re-enrolled her on the new phone, verified push on the first attempt. Priority three, authentication, resolved on first contact, about fifteen minutes.";
 
 var TRIAL_LIMIT=10;
@@ -1579,7 +1579,7 @@ function finishShare(url){
   el('shDone').addEventListener('click',function(){el('sharemodal').classList.remove('up')});
   el('shCopy').addEventListener('click',function(){copyText(url).then(function(ok){toast(ok?'Link copied.':'Clipboard blocked.')})});
   el('shSend').addEventListener('click',function(){
-    if(navigator.share)navigator.share({title:'TAKE ticket',url:url}).catch(function(){});
+    if(navigator.share)navigator.share({title:'SAY SO ticket',url:url}).catch(function(){});
     else copyText(url).then(function(ok){toast(ok?'Link copied — paste it wherever you like.':'Clipboard blocked.')});
   });
 }
@@ -1821,7 +1821,7 @@ if(DEBUG){
 
 /* ---- boot ---- */
 (function boot(){
-  log('TAKE booted · storage: '+(LSOK?'localStorage for preferences only':'memory only')+' · whisper is the only speech engine');
+  log('SAY SO booted · storage: '+(LSOK?'localStorage for preferences only':'memory only')+' · whisper is the only speech engine');
   log('plaintext lives on this page and nowhere else · a share link is the only optional export');
   if(!window.isSecureContext){
     log('page is not a secure context — the mic may be blocked; serve over http://localhost or https, or use DEMO','bad');
@@ -1833,7 +1833,7 @@ if(DEBUG){
     verifyLicense(el('lKey').value,PUBKEY_JWK).then(function(p){
       store(K.lic,{ok:1,key:el('lKey').value.trim(),email:p.e||p.email||'',at:Date.now()});
       updateLic();updatePipe();closeLicense();
-      toast('Licensed. Thank you for buying TAKE.');
+      toast('Licensed. Thank you for buying SAY SO.');
       log('license verified offline — public-key signature checks out','good');
     },function(e){
       toast('That key does not verify — '+(e&&e.message||e));

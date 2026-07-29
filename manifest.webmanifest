@@ -1,6 +1,6 @@
 {
-  "name": "TAKE — Dictation instrument for ticket work",
-  "short_name": "TAKE",
+  "name": "SAY SO — Dictation instrument for ticket work",
+  "short_name": "SAY SO",
   "description": "Talk the ticket the way you would tell a colleague. Fields extracted on your device, rendered in your house style, sealed before they travel.",
   "id": "./",
   "start_url": "./",

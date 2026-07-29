@@ -1,4 +1,4 @@
-# Shipping TAKE — phone first, then the stores
+# Shipping SAY SO — phone first, then the stores
 
 Written for: testing on your own iPhone and Android phone, building from a Windows PC, no Mac. Three phases, each usable on its own. Phase 1 needs about fifteen minutes and no money.
 
@@ -6,9 +6,9 @@ Written for: testing on your own iPhone and Android phone, building from a Windo
 
 The mic only works on HTTPS, so the phone needs a real URL, not a file. GitHub Pages gives you one for free and it doubles as your deploy pipeline forever.
 
-Step 1. On github.com: New repository → name it (say `take`) → Public → Create. Then "uploading an existing file" → drag everything inside the `take-app` folder in (every file sits at the root — no folders to worry about) → Commit.
+Step 1. On github.com: New repository → name it (say `say-so`) → Public → Create. Then "uploading an existing file" → drag everything inside the app folder in (every file sits at the root — no folders to worry about) → Commit.
 
-Step 2. Repo → Settings → Pages → Source: "Deploy from a branch" → Branch `main`, folder `/ (root)` → Save. In about a minute your app is live at `https://YOURNAME.github.io/take/`.
+Step 2. Repo → Settings → Pages → Source: "Deploy from a branch" → Branch `main`, folder `/ (root)` → Save. In about a minute your app is live at `https://YOURNAME.github.io/say-so/`.
 
 Step 3. Open that URL on each phone and run the same drill on both:
 
@@ -39,7 +39,7 @@ What you need: Node.js, a JDK, the Android SDK command-line tools, a Google Play
 
 `android/local.properties` points `sdk.dir` at that SDK path. (If Android Studio is ever installed properly later, it can just take over this same `sdk.dir` — nothing here is incompatible with it.)
 
-The Capacitor project is already scaffolded (`npx cap add android`, `android/` — gitignored, regenerate with the same command if it's ever missing) with the app ID `com.sundaespecial.take` in `capacitor.config.json`, and mic permissions already added to `android/app/src/main/AndroidManifest.xml`:
+The Capacitor project is already scaffolded (`npx cap add android`, `android/` — gitignored, regenerate with the same command if it's ever missing) with the app ID `com.sundaespecial.sayso` in `capacitor.config.json`, and mic permissions already added to `android/app/src/main/AndroidManifest.xml`:
 
 ```xml
 <uses-permission android:name="android.permission.RECORD_AUDIO" />
@@ -55,12 +55,12 @@ node tools/build-store.mjs
 npx cap sync android
 ```
 
-**Signing.** The release keystore already exists at `keys/take-release.keystore` (gitignored, alias `take`) — **this is the single most important file in this entire project to back up.** Losing it means this app listing can never receive another update, ever; Google cannot help recover it. Copy it to a password manager or encrypted backup now if that hasn't happened yet. The store/key password is not written to disk anywhere — it needs to be supplied as an environment variable when building:
+**Signing.** The release keystore already exists at `keys/take-release.keystore` (gitignored — file name and its `take` alias are internal/local only, left as-is through the rename since renaming them risks breaking the signing setup for zero visible benefit) — **this is the single most important file in this entire project to back up.** Losing it means this app listing can never receive another update, ever; Google cannot help recover it. Copy it to a password manager or encrypted backup now if that hasn't happened yet. The store/key password is not written to disk anywhere — it needs to be supplied as an environment variable when building:
 
 ```
 cd android
 $env:JAVA_HOME = "$env:LOCALAPPDATA\AndroidToolchain\jdk21\jdk-21.0.12+8"    # PowerShell
-$env:TAKE_KEYSTORE_PASS = "<the password>"
+$env:SAYSO_KEYSTORE_PASS = "<the password>"
 .\gradlew.bat bundleRelease --no-daemon
 ```
 
