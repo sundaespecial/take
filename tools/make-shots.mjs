@@ -13,7 +13,10 @@
  *   node tools/make-shots.mjs --capture  # also drives headless Chrome
  *
  * Requires the store build to exist (node tools/build-store.mjs) and, for
- * --capture, a local server on the port below.
+ * --capture, a local server on the port below. Start it from the repo root
+ * (`npx http-server ./www -p 8099 -c-1`) rather than from inside www/ — on
+ * Windows a process whose cwd is www/ holds a lock on the directory, and the
+ * next build-store run then fails to clear it.
  */
 import fs from 'node:fs';
 import path from 'node:path';
@@ -124,4 +127,8 @@ if (process.argv.includes('--capture')) {
     ], { stdio: 'pipe' });
     console.log('captured', path.relative(root, out));
   }
+  // These are full copies of the app with a debug harness stapled on, and
+  // `npx cap sync` ships anything sitting in www/. Never leave them there.
+  for (const s of scenarios) fs.rmSync(path.join(www, 'shot-' + s.name + '.html'), { force: true });
+  console.log('cleaned up www/shot-*.html');
 }
