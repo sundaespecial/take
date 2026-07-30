@@ -29,9 +29,22 @@ const outDir = path.join(root, 'assets', 'store', 'screenshots');
 const PORT = 8099;
 const CHROME = 'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe';
 
-// 450x800 CSS at 2.4x device scale lands exactly on 1080x1920 (9:16), and
-// 450 CSS px is wide enough that the device chrome isn't clipped.
-const CSS_W = 450, CSS_H = 800, SCALE = 2.4;
+// Play wants 16:9 or 9:16, so each target is a CSS viewport times a device
+// scale factor that lands on an exact 9:16 pixel size. The CSS width is what
+// the app actually lays out against, so it has to be a plausible width for
+// the device class — at 450 CSS px the phone layout fills the screen, while
+// at tablet widths the app centres its device frame, which is its real
+// appearance on a tablet rather than a stretched phone shot.
+const TARGETS = [
+  // phone: 1080x1920. 450 CSS px is the narrowest width that doesn't clip
+  // the device chrome (360 and 432 both cut off the settings gear).
+  { dir: 'phone', w: 450, h: 800, scale: 2.4 },
+  // 7-inch tablet: 1080x1920 at a 540dp-wide layout
+  { dir: 'tablet7', w: 540, h: 960, scale: 2 },
+  // 10-inch tablet: 1440x2560 at a 720dp-wide layout (10-inch shots must be
+  // at least 1080 px on every side, so the phone size would not qualify)
+  { dir: 'tablet10', w: 720, h: 1280, scale: 2 },
+];
 
 const src = fs.readFileSync(path.join(www, 'index.html'), 'utf8');
 if (!src.includes('</body>')) throw new Error('no </body> in store build');
@@ -114,18 +127,22 @@ for (const s of scenarios) {
 }
 
 if (process.argv.includes('--capture')) {
-  fs.mkdirSync(outDir, { recursive: true });
-  for (const s of scenarios) {
-    const out = path.join(outDir, s.name + '.png');
-    execFileSync(CHROME, [
-      '--headless=new', '--disable-gpu', '--hide-scrollbars',
-      '--window-size=' + CSS_W + ',' + CSS_H,
-      '--force-device-scale-factor=' + SCALE,
-      '--virtual-time-budget=' + s.budget,
-      '--screenshot=' + out,
-      'http://localhost:' + PORT + '/shot-' + s.name + '.html',
-    ], { stdio: 'pipe' });
-    console.log('captured', path.relative(root, out));
+  for (const t of TARGETS) {
+    const dir = path.join(outDir, t.dir);
+    fs.mkdirSync(dir, { recursive: true });
+    for (const s of scenarios) {
+      const out = path.join(dir, s.name + '.png');
+      execFileSync(CHROME, [
+        '--headless=new', '--disable-gpu', '--hide-scrollbars',
+        '--window-size=' + t.w + ',' + t.h,
+        '--force-device-scale-factor=' + t.scale,
+        '--virtual-time-budget=' + s.budget,
+        '--screenshot=' + out,
+        'http://localhost:' + PORT + '/shot-' + s.name + '.html',
+      ], { stdio: 'pipe' });
+      console.log('captured', path.relative(root, out),
+        '(' + t.w * t.scale + 'x' + t.h * t.scale + ')');
+    }
   }
   // These are full copies of the app with a debug harness stapled on, and
   // `npx cap sync` ships anything sitting in www/. Never leave them there.
