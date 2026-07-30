@@ -4,3 +4,4 @@ android/
 ios/
 www/
 .DS_Store
+dist/
