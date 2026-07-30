@@ -35,6 +35,24 @@ if (!buyRe.test(html)) {
 }
 html = html.replace(buyRe, "var BUY_URL='';");
 
+// Removing the gate isn't enough on its own: the header chip and the settings
+// line still advertise a trial that this build doesn't have. On a paid store
+// app that reads as a broken purchase, so both are switched to the licensed
+// wording rather than left counting down takes nobody is consuming.
+const chipRe = /(function updateLic\(\)\{\s*var c=el\('licChip'\);if\(!c\)return;)/;
+if (!chipRe.test(html)) {
+  console.error("updateLic() licChip pattern not found in index.html — update tools/build-store.mjs to match.");
+  process.exit(1);
+}
+html = html.replace(chipRe, "$1c.style.display='none';return;");
+
+const licLineRe = /el\('setLicLine'\)\.textContent=licState\(\)\?'Licensed\.':'Trial · '\+Math\.max\(0,TRIAL_LIMIT-trialUsed\(\)\)\+' takes left\.';/;
+if (!licLineRe.test(html)) {
+  console.error("setLicLine pattern not found in index.html — update tools/build-store.mjs to match.");
+  process.exit(1);
+}
+html = html.replace(licLineRe, "el('setLicLine').textContent='Licensed.';");
+
 fs.writeFileSync(path.join(outDir, 'index.html'), html);
 
 const assets = ['sw.js', 'manifest.webmanifest', 'icon-192.png', 'icon-512.png', 'icon-maskable-512.png', 'apple-touch-icon.png'];
