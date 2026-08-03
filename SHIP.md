@@ -48,6 +48,8 @@ The Capacitor project is already scaffolded (`npx cap add android`, `android/` �
 
 **Both `android/` and its manifest edit are gitignored — if this project is ever re-scaffolded from scratch, redo the app ID and these two permission lines before building.**
 
+**Version codes.** `android/app/build.gradle` holds `versionCode`/`versionName`, and `android/` is gitignored — a re-scaffold resets them to `1`/`1.0`. Play rejects an upload whose version code has already been used, so check and bump these before every release build. Currently at `versionCode 2` / `versionName "1.0.1"`.
+
 **App icons and splash screens.** A fresh `npx cap add android` ships Capacitor's own placeholder logo as the launcher icon — it will happily build and upload with that, so it has to be replaced deliberately every time the project is re-scaffolded. The brand source images are committed in `assets/` (`icon.png`, `icon-foreground.png`, `icon-background.png`, `splash.png`, `splash-dark.png`, all generated flat-vector, no photo assets), and the native resources are produced from them with:
 
 ```

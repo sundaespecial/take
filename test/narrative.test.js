@@ -14,7 +14,7 @@ function loadTestable() {
   const end = html.indexOf('/* __TESTABLE_END__');
   const body = html.slice(start, end);
   const names = ['extractFields', 'renderTicketNarrative', 'renderTicketText',
-    'encodeSharePayload', 'decodeSharePayload', 'b64u', 'unb64u'];
+    'encodeSharePayload', 'decodeSharePayload', 'b64u', 'unb64u', 'publicShareBase'];
   const wrapped = body + '\n;({' + names.map((n) => n + ':' + n).join(',') + '});';
   const sandbox = { btoa: (s) => Buffer.from(s, 'binary').toString('base64'),
     atob: (s) => Buffer.from(s, 'base64').toString('binary') };
@@ -22,7 +22,35 @@ function loadTestable() {
   return vm.runInContext(wrapped, sandbox, { filename: 'index.html (testable block)' });
 }
 
-const { extractFields, renderTicketNarrative, encodeSharePayload, decodeSharePayload } = loadTestable();
+const { extractFields, renderTicketNarrative, encodeSharePayload, decodeSharePayload,
+  publicShareBase } = loadTestable();
+
+const PUBLISHED = 'https://sundaespecial.github.io/say-so/';
+
+test('share links never point at an origin only the sender can reach', () => {
+  // The Android app runs on https://localhost (androidScheme "https"), so a
+  // link built from the running origin loads the recipient's own machine and
+  // fails. This is the bug that made emailed links dead on arrival.
+  assert.equal(
+    publicShareBase({ hostname: 'localhost', protocol: 'https:', origin: 'https://localhost', pathname: '/' }, PUBLISHED),
+    PUBLISHED);
+  assert.equal(
+    publicShareBase({ hostname: '127.0.0.1', protocol: 'http:', origin: 'http://127.0.0.1:8099', pathname: '/index.html' }, PUBLISHED),
+    PUBLISHED);
+  assert.equal(
+    publicShareBase({ hostname: '', protocol: 'file:', origin: 'null', pathname: '/C:/app/index.html' }, PUBLISHED),
+    PUBLISHED);
+});
+
+test('share links keep the real origin when the app is served publicly', () => {
+  assert.equal(
+    publicShareBase({ hostname: 'sundaespecial.github.io', protocol: 'https:', origin: 'https://sundaespecial.github.io', pathname: '/say-so/' }, PUBLISHED),
+    'https://sundaespecial.github.io/say-so/');
+  // a custom domain must survive without touching the fallback constant
+  assert.equal(
+    publicShareBase({ hostname: 'sayso.app', protocol: 'https:', origin: 'https://sayso.app', pathname: '/' }, PUBLISHED),
+    'https://sayso.app/');
+});
 
 test('narrative house style fills only what the transcript actually said', () => {
   const t = "Okay so this is for Dave Kowalski over in the Akron office, he called in about twenty minutes ago. His laptop won't connect to the VPN, keeps saying authentication failed. I checked and his cert had expired. Renewed it, tested the tunnel, he's good now. Priority two.";

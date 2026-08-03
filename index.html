@@ -1051,6 +1051,20 @@ function normalizeGain(pcm,peak){
   return pcm;
 }
 
+/* A share link has to open on somebody else's device, so the origin it is
+   built from must be publicly reachable. Inside the Android app it is not:
+   capacitor.config.json sets androidScheme "https", so the WebView serves the
+   app from https://localhost/ — and a link to localhost, opened on the
+   recipient's machine, points at their own computer and never loads. Local dev
+   servers and file:// have the same problem. In those cases fall back to the
+   published web app, which is where the receiver page actually lives. */
+function publicShareBase(loc,fallback){
+  loc=loc||{};
+  var host=String(loc.hostname||'');
+  var unreachable=host===''||host==='localhost'||host==='127.0.0.1'||host==='[::1]'||loc.protocol==='file:';
+  return unreachable?fallback:(String(loc.origin||'')+String(loc.pathname||''));
+}
+
 /* __TESTABLE_END__ */
 
 /* ================= app ================= */
@@ -1554,7 +1568,10 @@ function stopDemo(){
 
 /* ================= share sheet ================= */
 
-function shareURLBase(){return location.origin+location.pathname}
+/* Where share links point when the running origin cannot be reached from
+   another device. Update this if the app ever moves to a custom domain. */
+var SHARE_BASE='https://sundaespecial.github.io/say-so/';
+function shareURLBase(){return publicShareBase(location,SHARE_BASE)}
 
 function openShareSheet(){
   if(!S.take||!S.take.fields)return;
