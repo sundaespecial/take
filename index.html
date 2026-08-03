@@ -1571,17 +1571,22 @@ function openShareSheet(){
 }
 
 function buildSharePayload(){
-  return {n:S.take.n,at:Date.now(),ws:S.ws,you:S.you,
-    template:S.take.template,priority:S.take.priority,
-    fields:S.take.fields,desc:S.take.desc,
-    ticket:renderTicketNarrative(S.take,S.ws,S.you)||renderTicketText(S.take,S.ws)};
+  // Only what the receiver actually renders. It reads obj.ticket and nothing
+  // else, so shipping the fields array, the description and the take metadata
+  // as well roughly tripled the length of every link for no benefit — and an
+  // over-long link is the one thing that reliably breaks sharing, because
+  // messaging clients truncate what they cannot wrap.
+  return {ticket:renderTicketNarrative(S.take,S.ws,S.you)||renderTicketText(S.take,S.ws)};
 }
 
 function finishShare(url){
   var body=el('shareBody');
-  var big=url.length>6000;
+  // 6000 was far too generous to ever fire usefully: clients start mangling
+  // links well below that, and a truncated link fails as a wrong passphrase or
+  // a dead page rather than as an obvious length problem.
+  var big=url.length>1500;
   body.innerHTML='<h3>Link ready</h3>'
-    +(big?'<div class="warnbox">This link is long ('+url.length+' characters) and may not paste cleanly everywhere. Copy ticket instead if that happens.</div>':'')
+    +(big?'<div class="warnbox">This link is long ('+url.length+' characters). Some messaging apps cut long links, which makes them fail to open. If that happens, use Copy ticket and paste the text instead.</div>':'')
     +'<div class="linkbox">'+esc(url)+'</div>'
     +'<div class="mrow"><button class="act sm" id="shSend">Send…</button><button class="act sm ghost" id="shCopy">Copy link</button></div>'
     +'<div class="mrow" style="margin-top:8px"><button class="act sm ghost" id="shDone">Done</button></div>';

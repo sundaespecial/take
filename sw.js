@@ -1,7 +1,7 @@
 /* SAY SO service worker — app shell cached for offline use.
    Whisper model files are NOT cached here: transformers.js keeps its own
    Cache API store ('transformers-cache'), so the model survives offline anyway. */
-var CACHE = 'sayso-v0.4.2';
+var CACHE = 'sayso-v0.4.3';
 var SHELL = [
   './',
   './index.html',
