@@ -327,6 +327,8 @@
     font-family:'IBM Plex Mono',monospace;font-size:11.5px;line-height:1.72;
     white-space:pre-wrap;word-break:break-word;
   }
+  .tickethead{margin-bottom:9px;padding-bottom:7px;border-bottom:1px solid var(--hair);line-height:1.5}
+  .ticketmeta{color:var(--ink-soft);font-size:12px}
   .ticket h4{
     font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:.15em;
     text-transform:uppercase;color:var(--ink-soft);margin:11px 0 2px;font-weight:600;
@@ -427,8 +429,6 @@
   /* legal-pad receiver — deliberately its own look, not the instrument chrome */
   #receiver{display:none}
   #receiver.on{display:block}
-  body.receiving{background:#F4E9C4}
-  [data-theme="dark"] body.receiving{background:#2A2210}
   .padwrap{max-width:560px;margin:40px auto;padding:0 16px}
   .padtitle{font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.16em;text-transform:uppercase;
     color:#8a7a4a;margin-bottom:14px}
@@ -463,14 +463,6 @@
 </style>
 </head>
 <body>
-
-<!-- ============ LEGAL-PAD RECEIVER (shown only when a #take= share link is opened) ============ -->
-<div id="receiver">
-  <div class="padwrap">
-    <div class="padtitle">SAY SO · shared ticket</div>
-    <div id="receiverBody"></div>
-  </div>
-</div>
 
 <div class="wrap" id="mainapp">
 
@@ -680,9 +672,6 @@
 </div>
 
 <!-- share sheet -->
-<div class="modal" id="sharemodal" role="dialog" aria-modal="true" aria-labelledby="shareTitle">
-  <div class="mbox" id="shareBody"></div>
-</div>
 
 <script>
 /* ================================================================
@@ -926,6 +915,33 @@ function renderTicketText(take,ws){
   return out.trim();
 }
 
+function esc(s){return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;')}
+
+/* The same ticket as HTML, for the clipboard's text/html flavour. Pasting into
+   Google Docs, Word or an email body then keeps the headings and spacing
+   instead of arriving as one undifferentiated block. Plain text is written
+   alongside it, so anywhere that wants text still gets exactly what
+   renderTicketText produces. Deliberately inline-styled and tag-light: rich
+   editors discard stylesheets and mangle anything clever. */
+function renderTicketHTML(take,ws,you){
+  var narrative=renderTicketNarrative(take,ws,you);
+  var r=renderTicketParts(take,ws);
+  var out='<div style="font-family:Arial,Helvetica,sans-serif;font-size:11pt;line-height:1.45">';
+  out+='<p style="margin:0 0 2pt"><b>'+esc(r.head1)+'</b></p>';
+  if(r.meta)out+='<p style="margin:0 0 10pt;color:#555">'+esc(r.meta)+'</p>';
+  if(narrative){
+    narrative.split(/\n{2,}/).forEach(function(para){
+      if(para.trim())out+='<p style="margin:0 0 8pt">'+esc(para.trim()).replace(/\n/g,'<br>')+'</p>';
+    });
+  }else{
+    r.parts.forEach(function(p){
+      out+='<p style="margin:0 0 2pt"><b>'+esc(p[0].toUpperCase())+'</b></p>';
+      out+='<p style="margin:0 0 8pt">'+esc(p[1]).replace(/\n/g,'<br>')+'</p>';
+    });
+  }
+  return out+'</div>';
+}
+
 // "fills, never composes": the narrative house style only ever assembles
 // sentences out of substrings the extractor actually pulled from the
 // transcript. If a required fact is missing it returns null rather than
@@ -951,61 +967,6 @@ function renderTicketNarrative(take,ws,you){
 }
 
 /* ---- crypto: PBKDF2(310k, SHA-256) -> AES-256-GCM, WebCrypto only ---- */
-function b64(buf){
-  var u=new Uint8Array(buf),s='';
-  for(var i=0;i<u.length;i++)s+=String.fromCharCode(u[i]);
-  return btoa(s);
-}
-function unb64(str){
-  var s=atob(str),u=new Uint8Array(s.length);
-  for(var i=0;i<s.length;i++)u[i]=s.charCodeAt(i);
-  return u;
-}
-// base64url helpers, for embedding JSON payloads in a URL fragment
-function b64u(str){
-  return btoa(unescape(encodeURIComponent(str))).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'');
-}
-function unb64u(str){
-  str=String(str||'').replace(/-/g,'+').replace(/_/g,'/');
-  while(str.length%4)str+='=';
-  return decodeURIComponent(escape(atob(str)));
-}
-function deriveKey(pass,salt){
-  return crypto.subtle.importKey('raw',new TextEncoder().encode(pass),'PBKDF2',false,['deriveKey'])
-    .then(function(km){
-      return crypto.subtle.deriveKey(
-        {name:'PBKDF2',salt:salt,iterations:310000,hash:'SHA-256'},
-        km,{name:'AES-GCM',length:256},false,['encrypt','decrypt']);
-    });
-}
-function sealTake(obj,pass){
-  var salt=crypto.getRandomValues(new Uint8Array(16));
-  var iv=crypto.getRandomValues(new Uint8Array(12));
-  return deriveKey(pass,salt).then(function(key){
-    return crypto.subtle.encrypt({name:'AES-GCM',iv:iv},key,
-      new TextEncoder().encode(JSON.stringify(obj)));
-  }).then(function(ct){
-    return {v:1,alg:'AES-256-GCM/PBKDF2-SHA256-310k',s:b64(salt),i:b64(iv),c:b64(ct)};
-  });
-}
-function unsealTake(blob,pass){
-  return deriveKey(pass,unb64(blob.s)).then(function(key){
-    return crypto.subtle.decrypt({name:'AES-GCM',iv:unb64(blob.i)},key,unb64(blob.c));
-  }).then(function(pt){
-    return JSON.parse(new TextDecoder().decode(pt));
-  });
-}
-
-/* ---- ephemeral share links: "p1." = sealed (private), "o1." = plain (open) ---- */
-function encodeSharePayload(kind,obj){
-  return kind+'.'+b64u(JSON.stringify(obj));
-}
-function decodeSharePayload(fragment){
-  var m=String(fragment||'').match(/take=([a-z0-9]+)\.(.+)$/i);
-  if(!m)return null;
-  try{return {kind:m[1],obj:JSON.parse(unb64u(m[2]))}}catch(e){return null}
-}
-
 /* ---- license keys: ECDSA P-256 over a JSON payload, verified offline ---- */
 function bytesFromB64u(str){
   str=String(str||'').replace(/-/g,'+').replace(/_/g,'/');
@@ -1049,20 +1010,6 @@ function normalizeGain(pcm,peak){
     pcm[i]=v>1?1:(v<-1?-1:v);
   }
   return pcm;
-}
-
-/* A share link has to open on somebody else's device, so the origin it is
-   built from must be publicly reachable. Inside the Android app it is not:
-   capacitor.config.json sets androidScheme "https", so the WebView serves the
-   app from https://localhost/ — and a link to localhost, opened on the
-   recipient's machine, points at their own computer and never loads. Local dev
-   servers and file:// have the same problem. In those cases fall back to the
-   published web app, which is where the receiver page actually lives. */
-function publicShareBase(loc,fallback){
-  loc=loc||{};
-  var host=String(loc.hostname||'');
-  var unreachable=host===''||host==='localhost'||host==='127.0.0.1'||host==='[::1]'||loc.protocol==='file:';
-  return unreachable?fallback:(String(loc.origin||'')+String(loc.pathname||''));
 }
 
 /* __TESTABLE_END__ */
@@ -1112,7 +1059,6 @@ applyFinish();
 applyWave();
 
 function el(id){return document.getElementById(id)}
-function esc(s){return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;')}
 function pad(n){return (n<10?'0':'')+n}
 function fmt(s){return pad(Math.floor(s/60))+':'+pad(s%60)}
 function now(){var d=new Date();return pad(d.getHours())+':'+pad(d.getMinutes())+':'+pad(d.getSeconds())}
@@ -1175,6 +1121,24 @@ function askPass(title,note,okLabel){
 }
 
 /* ---- clipboard ---- */
+/* Writes both flavours so the paste target picks what it understands: Google
+   Docs and mail clients take the HTML and keep the headings, plain editors take
+   the text. Falls back to text-only wherever ClipboardItem is missing — notably
+   the Android WebView, which is exactly where the old share button silently
+   did nothing, so this path degrades visibly rather than pretending. */
+function copyRich(html,text){
+  if(navigator.clipboard&&navigator.clipboard.write&&typeof ClipboardItem!=='undefined'){
+    try{
+      var item=new ClipboardItem({
+        'text/html':new Blob([html],{type:'text/html'}),
+        'text/plain':new Blob([text],{type:'text/plain'})
+      });
+      return navigator.clipboard.write([item]).then(function(){return true},function(){return copyText(text)});
+    }catch(e){return copyText(text)}
+  }
+  return copyText(text);
+}
+
 function copyText(t){
   function fallback(){
     try{
@@ -1252,29 +1216,43 @@ function screenTicket(){
     if(S.failedAudio)return screenRetry();
     return emptyDevice('Ticket','Nothing yet. Record a take on Capture, or press DEMO.');
   }
-  var youN=0,checkN=0,fh='';
-  S.take.fields.forEach(function(f){
-    if(!f.val)youN++;else if(f.tag==='check')checkN++;
-    fh+=fieldHTML(f);
-  });
-  var verdict='<b>Nothing was invented.</b><br>'
-    +(youN?youN+' field'+(youN===1?' was':'s were')+' never said out loud — empty until you fill '+(youN===1?'it':'them')+'. ':'Every field came from the transcript. ')
-    +(checkN?checkN+' amber field'+(checkN===1?'':'s')+' deserve'+(checkN===1?'s':'')+' a second read.':'');
-  var narrative=renderTicketNarrative(S.take,S.ws,S.you);
-  var ticketBody=narrative?('<div class="ticket narrative">'+esc(narrative)+'</div>')
-    :(function(){var r=renderTicketParts(S.take,S.ws),body='';r.parts.forEach(function(p){body+='<h4>'+esc(p[0])+'</h4>'+esc(p[1])});return '<div class="ticket">'+body+'</div>'})();
+  var fh='';
+  S.take.fields.forEach(function(f){fh+=fieldHTML(f)});
   return '<div class="device"><div class="screen">'
   +'<div class="statusbar"><span class="airplane"><i class="dot"></i><span>Take '+S.take.n+'</span></span></div>'
   +'<div class="body"><div class="pad">'
     +'<div class="screentitle">Check the facts</div>'
     +fh
-    +'<div class="verdict">'+verdict+'</div>'
-    +'<div class="screentitle" style="margin-top:16px">Ready to paste</div>'
-    +'<span class="eyebrow" style="display:block;margin-bottom:9px">'+(narrative?'Narrative house style':'Structured fields — narrative style needs a name, requester, and resolution')+'</span>'
-    +ticketBody
-    +'<div class="actrow"><button class="act grad" id="copyTicket">Copy ticket</button><button class="act ghost" id="shareTicket">Share</button></div>'
+    +'<div id="ticketOut">'+ticketOutHTML()+'</div>'
+    +'<div class="actrow"><button class="act grad" id="copyTicket">Copy ticket</button></div>'
   +'</div></div>'
   +'<div class="toast" id="toast"></div></div></div>';
+}
+
+/* Everything downstream of the fields: the verdict, and the rendered ticket
+   itself. Split out of screenTicket so an edit to a field can re-render just
+   this, leaving the contenteditable fields — and the caret inside the one
+   being typed in — untouched. */
+function ticketOutHTML(){
+  var youN=0,checkN=0;
+  S.take.fields.forEach(function(f){if(!f.val)youN++;else if(f.tag==='check')checkN++});
+  var verdict='<b>Nothing was invented.</b><br>'
+    +(youN?youN+' field'+(youN===1?' was':'s were')+' never said out loud — empty until you fill '+(youN===1?'it':'them')+'. ':'Every field came from the transcript. ')
+    +(checkN?checkN+' amber field'+(checkN===1?'':'s')+' deserve'+(checkN===1?'s':'')+' a second read.':'');
+  var narrative=renderTicketNarrative(S.take,S.ws,S.you);
+  var r=renderTicketParts(S.take,S.ws);
+  // The header and the meta line are part of what Copy puts on the clipboard,
+  // so they belong on screen too. Leaving them out meant correcting a field
+  // that only appears there — the requester, the office — changed the copied
+  // ticket while the preview sat there looking identical.
+  var head='<div class="tickethead"><b>'+esc(r.head1)+'</b>'+(r.meta?'<br><span class="ticketmeta">'+esc(r.meta)+'</span>':'')+'</div>';
+  var ticketBody=narrative
+    ?('<div class="ticket narrative">'+head+esc(narrative)+'</div>')
+    :(function(){var body='';r.parts.forEach(function(p){body+='<h4>'+esc(p[0])+'</h4>'+esc(p[1])});return '<div class="ticket">'+head+body+'</div>'})();
+  return '<div class="verdict">'+verdict+'</div>'
+    +'<div class="screentitle" style="margin-top:16px">Ready to paste</div>'
+    +'<span class="eyebrow" style="display:block;margin-bottom:9px">'+(narrative?'Narrative house style':'Structured fields — narrative style needs a name, requester, and resolution')+'</span>'
+    +ticketBody;
 }
 
 function screenRetry(){
@@ -1566,130 +1544,6 @@ function stopDemo(){
   finishTake();
 }
 
-/* ================= share sheet ================= */
-
-/* Where share links point when the running origin cannot be reached from
-   another device. Update this if the app ever moves to a custom domain. */
-var SHARE_BASE='https://sundaespecial.github.io/say-so/';
-function shareURLBase(){return publicShareBase(location,SHARE_BASE)}
-
-function openShareSheet(){
-  if(!S.take||!S.take.fields)return;
-  var m=el('sharemodal'),body=el('shareBody');
-  body.innerHTML='<h3>Share this ticket</h3>'
-    +'<p>This makes a link, not a saved copy. Nothing is stored anywhere — the ticket travels inside the link itself, the same way a YouTube link carries a video ID.</p>'
-    +'<div class="mrow"><button class="act sm" id="shPrivate">Private<br><span style="font-weight:400;font-size:9.5px">passphrase-protected</span></button>'
-    +'<button class="act sm ghost" id="shOpen">Open<br><span style="font-weight:400;font-size:9.5px">anyone with the link</span></button></div>'
-    +'<div class="mrow" style="margin-top:8px"><button class="act sm ghost" id="shCancel">Cancel</button></div>';
-  m.classList.add('up');
-  el('shPrivate').addEventListener('click',function(){shareFlow('private')});
-  el('shOpen').addEventListener('click',function(){shareFlow('open')});
-  el('shCancel').addEventListener('click',function(){m.classList.remove('up')});
-}
-
-function buildSharePayload(){
-  // Only what the receiver actually renders. It reads obj.ticket and nothing
-  // else, so shipping the fields array, the description and the take metadata
-  // as well roughly tripled the length of every link for no benefit — and an
-  // over-long link is the one thing that reliably breaks sharing, because
-  // messaging clients truncate what they cannot wrap.
-  return {ticket:renderTicketNarrative(S.take,S.ws,S.you)||renderTicketText(S.take,S.ws)};
-}
-
-function finishShare(url){
-  var body=el('shareBody');
-  // 6000 was far too generous to ever fire usefully: clients start mangling
-  // links well below that, and a truncated link fails as a wrong passphrase or
-  // a dead page rather than as an obvious length problem.
-  var big=url.length>1500;
-  body.innerHTML='<h3>Link ready</h3>'
-    +(big?'<div class="warnbox">This link is long ('+url.length+' characters). Some messaging apps cut long links, which makes them fail to open. If that happens, use Copy ticket and paste the text instead.</div>':'')
-    +'<div class="linkbox">'+esc(url)+'</div>'
-    +'<div class="mrow"><button class="act sm" id="shSend">Send…</button><button class="act sm ghost" id="shCopy">Copy link</button></div>'
-    +'<div class="mrow" style="margin-top:8px"><button class="act sm ghost" id="shDone">Done</button></div>';
-  el('shDone').addEventListener('click',function(){el('sharemodal').classList.remove('up')});
-  el('shCopy').addEventListener('click',function(){copyText(url).then(function(ok){toast(ok?'Link copied.':'Clipboard blocked.')})});
-  el('shSend').addEventListener('click',function(){
-    if(navigator.share)navigator.share({title:'SAY SO ticket',url:url}).catch(function(){});
-    else copyText(url).then(function(ok){toast(ok?'Link copied — paste it wherever you like.':'Clipboard blocked.')});
-  });
-}
-
-function shareFlow(kind){
-  var body=el('shareBody');
-  if(kind==='open'){
-    body.innerHTML='<h3>Open link</h3>'
-      +'<div class="warnbox">Anyone with this link can read the ticket. There is no passphrase.</div>'
-      +'<div class="mrow"><button class="act sm" id="shOpenConfirm">Generate anyway</button><button class="act sm ghost" id="shOpenCancel">Back</button></div>';
-    el('shOpenCancel').addEventListener('click',openShareSheet);
-    el('shOpenConfirm').addEventListener('click',function(){
-      var url=shareURLBase()+'#take='+encodeSharePayload('o1',buildSharePayload());
-      log('open share link generated — plainly readable by anyone who has it','warn');
-      finishShare(url);
-    });
-    return;
-  }
-  body.innerHTML='<h3>Private link</h3>'
-    +'<p>Encrypted with AES-256-GCM, key derived from a passphrase you choose. The passphrase never goes in the link — send it a different way (say it on a call, a separate text).</p>'
-    +'<input type="password" id="shPass" placeholder="at least 6 characters" autocomplete="off">'
-    +'<div class="mrow"><button class="act sm" id="shPassGo" disabled>Seal &amp; generate link</button><button class="act sm ghost" id="shPassCancel">Back</button></div>';
-  var pi=el('shPass'),go2=el('shPassGo');
-  pi.addEventListener('input',function(){go2.disabled=pi.value.length<6});
-  el('shPassCancel').addEventListener('click',openShareSheet);
-  go2.addEventListener('click',function(){
-    var pass=pi.value;
-    sealTake(buildSharePayload(),pass).then(function(blob){
-      var url=shareURLBase()+'#take='+encodeSharePayload('p1',blob);
-      log('private share link generated — sealed, passphrase never included','good');
-      finishShare(url);
-    },function(e){toast('Could not seal: '+(e&&e.message||e))});
-  });
-}
-
-/* ================= legal-pad receiver ================= */
-
-function tryReceiver(){
-  var parsed=decodeSharePayload(location.hash);
-  if(!parsed)return false;
-  document.body.classList.add('receiving');
-  el('mainapp').style.display='none';
-  var r=el('receiver');r.classList.add('on');
-  if(parsed.kind==='o1')renderReceiverTicket(parsed.obj);
-  else renderReceiverLocked();
-  return true;
-
-  function renderReceiverLocked(){
-    el('receiverBody').innerHTML='<div class="padsheet"><input type="password" class="padpass" id="recvPass" placeholder="passphrase" autocomplete="off">'
-      +'<div class="padbtn" id="recvGo" role="button" tabindex="0">Open</div>'
-      +'<div class="padtext" id="recvMsg" style="margin-top:14px;font-size:12px"></div></div>';
-    function tryOpen(){
-      var pass=el('recvPass').value;
-      unsealTake(parsed.obj,pass).then(function(obj){renderReceiverTicket(obj)},function(){
-        el('recvMsg').textContent='Wrong passphrase, or the link is damaged.';
-      });
-    }
-    el('recvGo').addEventListener('click',tryOpen);
-    el('recvPass').addEventListener('keydown',function(e){if(e.key==='Enter')tryOpen()});
-  }
-  function renderReceiverTicket(obj){
-    var text=obj&&obj.ticket||'';
-    el('receiverBody').innerHTML='<div class="padsheet"><div class="padtext" id="padText" contenteditable="true">'+esc(text)+'</div></div>'
-      +'<div class="padactions"><button class="padbtn" id="padCopy">Copy</button><button class="padbtn" id="padClear">Clear</button></div>';
-    el('padCopy').addEventListener('click',function(){
-      copyText(el('padText').textContent).then(function(ok){toast(ok?'Copied.':'Clipboard blocked.')});
-    });
-    el('padClear').addEventListener('click',clearReceiver);
-  }
-  function clearReceiver(){
-    el('receiverBody').innerHTML='';
-    history.replaceState(null,'',location.pathname+location.search);
-    el('receiver').classList.remove('on');
-    document.body.classList.remove('receiving');
-    el('mainapp').style.display='';
-    go(0);
-  }
-}
-
 /* ================= wiring ================= */
 
 function collectReviewEdits(){
@@ -1724,20 +1578,23 @@ function bind(){
       var head=v.parentElement.querySelector('.tag.you');
       if(head&&v.textContent.trim())head.remove();
       collectReviewEdits();
+      // rewrite the rendered ticket as you type, so correcting a name or a
+      // missing field shows up immediately instead of on the next screen change
+      var out=el('ticketOut');
+      if(out)out.innerHTML=ticketOutHTML();
     });
   });
 
   var cp=el('copyTicket');
   if(cp)cp.addEventListener('click',function(){
+    collectReviewEdits();
     var text=renderTicketNarrative(S.take,S.ws,S.you)||renderTicketText(S.take,S.ws);
-    copyText(text).then(function(ok){
-      toast(ok?'Copied. Paste into your ticketing system.':'Clipboard blocked by the browser.');
-      if(ok)log('ticket copied to clipboard — zero scopes needed','good');
+    var html=renderTicketHTML(S.take,S.ws,S.you);
+    copyRich(html,text).then(function(ok){
+      toast(ok?'Copied with formatting. Paste into your doc or ticket.':'Clipboard blocked by the browser.');
+      if(ok)log('ticket copied — rich text and plain text, nothing left this device','good');
     });
   });
-  var sh=el('shareTicket');
-  if(sh)sh.addEventListener('click',openShareSheet);
-
   var rt=el('retryBtn');
   if(rt)rt.addEventListener('click',function(){
     var blob=S.failedAudio;if(!blob)return;
@@ -1886,8 +1743,6 @@ if(DEBUG){
   el('m-install').addEventListener('click',function(){
     if(S._install){S._install.prompt();S._install=null;el('m-install').style.display='none'}
   });
-
-  if(tryReceiver())return;
   go(0);
   if(!S.wh.ready&&!S.wh.loading)loadWhisper().catch(function(){}); // quiet preload, no engine choice to make
 })();

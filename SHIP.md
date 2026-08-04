@@ -16,7 +16,7 @@ Android (Chrome): press REC → allow the microphone → talk a fake ticket → 
 
 iPhone (Safari): same drill. Install: Share → Add to Home Screen. The installed copy runs full-screen with its own icon and the mic works inside it.
 
-Also worth testing on both: from the Ticket screen, tap Share → Private, set a passphrase, generate the link, then open that link in another tab or device and unseal it; try an Open link too and confirm the "anyone with this link" warning shows before it generates; burn through the 10-take trial and unlock with a key you issue yourself (`node keygen.mjs issue you@example.com`, using the private key from `node keygen.mjs init`); open Settings and flip the finish (Light/Dark/System) and waveform color (Rainbow/Black & White/Amber).
+Also worth testing on both: from the Ticket screen, edit a field and watch the rendered ticket below it update as you type, then press Copy and paste into Google Docs to confirm the headings survive; burn through the 10-take trial and unlock with a key you issue yourself (`node keygen.mjs issue you@example.com`, using the private key from `node keygen.mjs init`); open Settings and flip the finish (Light/Dark/System) and waveform color (Rainbow/Black & White/Amber).
 
 A note on "solely on my phone": the Pages URL is public but unguessable, and the license gate limits freeloaders to 10 takes. If you want testing with nothing published at all, run `npx http-server -p 8080 .` on the PC and in another terminal `npx localtunnel --port 8080` — it prints a temporary HTTPS URL your phone can open (the first visit shows a gate page; the password it asks for is your public IP, shown at https://loca.lt/mytunnelpassword).
 

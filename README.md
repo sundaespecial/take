@@ -2,7 +2,7 @@
 
 Dictation instrument for ticket work. Press REC, talk the way you would tell a colleague, stop — SAY SO transcribes on-device with Whisper, extracts the facts into fields (fills, never composes), and renders a ticket. Two screens only: **Capture** and **Ticket**. Everything else — finish, waveform color, your name, license — lives behind the settings gear so it never competes with those two.
 
-Whisper is the only speech engine; it runs entirely on the device, model and all. Two material finishes (Light, Dark, or System) and three waveform color presets (Rainbow, Black & White, Amber). Sharing a finished ticket to a desktop is a link, not an account: Private links are AES-256-GCM sealed with a passphrase you choose, Open links are plainly encoded and say so before you generate one. Either way there is no server — the link carries the ticket, the same way a video link carries a video ID. Opening a SAY SO share link renders a small "legal pad" receiver page with Copy and Clear; nothing is ever stored.
+Whisper is the only speech engine; it runs entirely on the device, model and all. Two material finishes (Light, Dark, or System) and three waveform color presets (Rainbow, Black & White, Amber). Getting a finished ticket out is a single Copy: it lands on the clipboard as formatted HTML and as plain text at the same time, so it keeps its headings when pasted into Google Docs, Word or an email and still pastes cleanly into a plain text box. Nothing is uploaded and no copy is kept.
 
 One HTML file, no build step, no backend required.
 
@@ -65,7 +65,7 @@ Open the page with `?debug=1` to see the Schematic diagram and the operator's lo
 ## Repo map
 
 ```
-index.html              the entire app — UI, extractor, crypto, license gate, share links
+index.html              the entire app — UI, extractor, license gate, clipboard export
 sw.js                   offline shell caching
 manifest.webmanifest    install metadata
 icon-*.png              app icons, light-on-ebony (flat, so any uploader works)

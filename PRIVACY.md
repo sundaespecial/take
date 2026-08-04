@@ -52,27 +52,18 @@ object if `localStorage` is unavailable, e.g. private browsing) are:
 Neither of those is ticket content. Clearing your browser's site data for this page
 removes both.
 
-## Sharing a ticket
+## Getting the ticket out
 
-Sharing is optional and produces a link, not a saved copy — closer to sharing a
-video link than saving to a database:
+There is one way a ticket leaves this page, and you trigger it: **Copy**. The
+rendered ticket is written to your system clipboard in two flavours at once —
+formatted HTML, so a paste into Google Docs, Word or an email body keeps its
+headings, and plain text for anywhere that wants text. Both are the same
+ticket; nothing is uploaded, and no copy is kept.
 
-- **Private** (default): the ticket payload is encrypted in the browser with
-  AES-256-GCM, key derived by PBKDF2 (310,000 iterations, SHA-256) from a
-  passphrase you choose. The passphrase is never included in the link, never
-  stored, and never transmitted — you send it to the recipient a different way.
-- **Open**: the payload is Base64URL-encoded, not encrypted. SAY SO shows an explicit
-  "anyone with this link can read the ticket" warning before generating one.
-
-Either way, the payload lives entirely in the URL fragment (`#take=...`), which
-browsers never send to a server — so even though the link *looks* like it points at
-a page, nothing about its content is transmitted anywhere by opening it. Opening a
-SAY SO share link on another device renders a minimal receiver page that decodes it
-client-side, shows the ticket text with Copy and Clear, and writes nothing to
-storage. Clearing the receiver also strips the fragment from the address bar.
-
-There is no server anywhere in this flow. You are responsible for how the link
-itself travels (native share sheet, message, email) — SAY SO only makes the link.
+Earlier builds could also turn a ticket into a share link. That feature has been
+removed entirely, along with the encryption, the link encoding and the receiver
+page that went with it. Nothing in this app now produces a URL containing your
+ticket.
 
 ## Network requests this page makes
 
@@ -90,9 +81,6 @@ itself travels (native share sheet, message, email) — SAY SO only makes the li
   external storefront URL (`BUY_URL` in `index.html`, e.g. Gumroad/Lemon
   Squeezy/Stripe) in a new tab, only when you click it. That storefront's own
   privacy policy governs what happens there, not this one.
-- **A share link, only if you make one**: generating and sending a share link is
-  the only other way anything about a ticket ever leaves this page, and it only
-  happens when you explicitly choose to share.
 
 Nothing else calls out over the network. There is no analytics or telemetry script
 in this codebase.
